@@ -45,7 +45,7 @@ def solution(n):
                             / n
                             * (1 - (after_jail[i] + after_two_jail[i]) / ip)
                             + 1 / n / n * (after_two_jail[i] / ip)
-                            if i != 10 and d1 == d2
+                            if ip and i != 10 and (d1 == d2)
                             else 0
                         )
                         newboard[10] += ip * sp * pspeed
@@ -84,3 +84,4 @@ def main():
 
 
 main()
+

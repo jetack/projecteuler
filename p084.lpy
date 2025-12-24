@@ -66,7 +66,7 @@
           ;; consecutive
           (if (== d1 d2)
               (do (= pspeed
-                     (ife (and (!= i 10) (== d1 d2))
+                     (ife (and ip (!= i 10) (== d1 d2))
                           (+ (* (/ (- n 1) n n n)
                                 (- 1
                                    (/ (+ (sub after-jail i)
