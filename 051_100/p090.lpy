@@ -1,0 +1,48 @@
+(require lispy.macros *)
+
+(from time [time])
+
+(def get-arrangements [pool :max-depth 6]
+  (def recur [:path (list) :last-d -1 :depth 0 :ret (list)]
+    (when (== depth max-depth)
+      (.append ret (list path))
+      (return ret))
+    (for d (range (+ last-d 1) (len pool))
+      (recur (+ path [(sub pool d)]) d (inc depth)))
+    (return ret))
+  (return (recur)))
+
+(def specific-include [elt arr]
+  (return (or (in elt arr)
+              (and (== elt 6)
+                   (in 9 arr))
+              (and (== elt 9)
+                   (in 6 arr)))))
+
+(def can-represent [arr1 arr4]
+  (for i (range 1 10)
+    (= [a b] (divmod (* i i) 10))
+    (when (not (or (and (specific-include a arr4)
+                        (specific-include b arr1))
+                   (and (specific-include b arr4)
+                        (specific-include a arr1))))
+      (return False)))
+  (return True))
+
+(def solution []
+  (= arrs (get-arrangements (range 10)))
+  (= l (len arrs))
+  (= res 0)
+  (for i (range l)
+    (for j (range (inc i) l)
+      (when (can-represent (sub arrs i) (sub arrs j))
+        (++ res))))
+  (return res))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(when (== __name__ "__main__")
+  (main))
