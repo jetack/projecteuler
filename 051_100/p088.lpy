@@ -1,0 +1,67 @@
+(require lispy.macros *)
+
+(from bisect *)
+(from collections [defaultdict])
+(from time [time])
+
+(def factorize [n primes]
+  ;; assure primes has all primes<n
+  (= res (defaultdict int))
+  (= k n)
+  (for p primes
+    (when (> p k)
+      (return res))
+    (while (== (% k p) 0)
+      (+= (sub res p) 1)
+      (//= k p)))
+  (return res))
+
+(def get-possibilities [factorization]
+  (= factors [])
+  (for [k v] (.items factorization)
+    (+= factors (* [k] v)))
+  (def recur [factors]
+    (when (not factors)
+      (return [(tuple)]))
+    (= factor (factors.pop))
+    (= res (set))
+    (for rep (recur factors)
+      (res.add (tuple (sorted (list (+ rep (, factor))))))
+      (for i (range (len rep))
+        (= cp (list rep))
+        (*= (sub cp i) factor)
+        (res.add (tuple (sorted cp)))))
+    (return res))
+  (return (recur factors)))
+
+(def solution [:N 12000]
+  (= primes [2 3])
+  (= mem (* [None] (inc N)))
+  (= cnt (dec N))
+  (= n 3)
+  (while cnt
+    (+= n 1)
+    (= factorization (factorize n primes))
+    (when (not factorization)
+      (primes.append n)
+      (continue))
+    (for p (get-possibilities factorization)
+      (= k (+ (- n (sum p)) (len p)))
+      (when (or (<= k 1)
+                (> k N))
+        (continue))
+      (when (is None (sub mem k))
+        (-= cnt 1)
+        (= (sub mem k) n))))
+  (return (-> mem
+              (sub [: 2 _])
+              (set)
+              (sum))))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(when (== __name__ "__main__")
+  (main))
