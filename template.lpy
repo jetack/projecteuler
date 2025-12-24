@@ -1,0 +1,12 @@
+(from time [time])
+
+(def solution []
+  )
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(when (== __name__ "__main__")
+  (main))
