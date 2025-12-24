@@ -1,0 +1,40 @@
+(defmacro defclass [*body]
+  (return `(class ~@body)))
+
+(defmacro defn [*body]
+  (return `(def ~@body)))
+
+(defmacro when [condition *body]
+  (return `(if ~condition
+               (do ~@body))))
+
+(defmacro lif [condition *body]
+  (return `(if (is-not ~condition None)
+               ~@body)))
+
+(defmacro life [condition *body]
+  (return `(ife (is-not ~condition None)
+                ~@body)))
+
+(defmacro setv [*body]
+  (= pairs [(sub body [: i (+ i 2)])
+            for i in (range 0 (len body) 2)])
+  (return `(do ~@[`(= ~@pair)
+                  for pair in pairs])))
+
+(defmacro get [*body]
+  (return `(sub ~@body)))
+
+(defmacro lfor [it coll elt-form]
+  (return `[~elt-form for ~it in ~coll]))
+
+(defmacro dfor [it coll k v]
+  (return `{~k ~v for ~it in ~coll}))
+
+(defmacro cut [*body]
+  (= [coll *slice-info] body)
+  (return `(sub ~coll [: ~@slice-info])))
+
+(defmacro for-hy [repeater *body]
+  (= [var coll] repeater)
+  (return `(for ~var ~coll ~@body)))
