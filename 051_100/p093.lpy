@@ -1,0 +1,65 @@
+(require lispy.macros *)
+
+(from time [time])
+
+(= fns [(fn [x y] (+ x y))
+        (fn [x y] (- x y))
+        (fn [x y] (* x y))
+        (fn [x y] (/ x y))])
+
+(def get-possibilities [lst]
+  (def recur [lst :rst (set)]
+    (when (== (len lst) 1)
+      (= t (sub lst 0))
+      (when (and (== t (int t))
+                 (> t 0))
+        (rst.add t))
+      (return 0))
+    (for i (range (len lst))
+      (= a (lst.pop i))
+      (for j (range (len lst))
+        (= b (lst.pop j))
+        (for [k f] (enumerate fns)
+          (when (and (== k 3) (== b 0))
+            (continue))
+          (recur (+ lst [(f a b)])))
+        (lst.insert j b))
+      (lst.insert i a))
+    (return rst))
+  (return (sorted (recur lst))))
+
+(def count-consecutive [ss]
+  (for i (range 1 (len ss))
+    (when (not (in i ss))
+      (return (- i 1))))
+  (return (len ss)))
+
+(def get-digits [:l 4]
+  (def recur [:path (list) :depth 0 :last-i -1 :rst (list)]
+    (when (== depth l)
+      (rst.append path)
+      (return rst))
+    (for i (range (inc last-i) 10)
+      (recur (+ path [i]) (inc depth) i))
+    (return rst))
+  (return (recur)))
+
+(def solution []
+  (= longest-mem 0)
+  (= wanted-set None)
+  (for digits (get-digits 4)
+    (= consec (-> digits
+                  (get-possibilities)
+                  (count-consecutive)))
+    (when (> consec longest-mem)
+      (= longest-mem consec)
+      (= wanted-set digits)))
+  (return [longest-mem wanted-set]))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(when (== __name__ "__main__")
+  (main))
