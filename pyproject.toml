@@ -1,0 +1,14 @@
+[project]
+name = "projecteuler"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "lispython",
+    "lpy-autocomplete",
+]
+
+[tool.uv.sources]
+lispython = { path = "../lispython", editable = true }
+lpy-autocomplete = { path = "../lpy-autocomplete", editable = true }
