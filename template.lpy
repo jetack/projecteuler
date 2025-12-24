@@ -1,3 +1,5 @@
+(require lispy.macros *)
+
 (from time [time])
 
 (def solution []
