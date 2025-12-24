@@ -1,0 +1,43 @@
+(require lispy.macros *)
+
+(import json)
+(from collections [Counter defaultdict])
+(from time [time])
+
+(def counter-to-str [d]
+  (return (-> d
+              (.items)
+              (sorted)
+              (->> (map (fn [x] (+ (sub x 0)
+                                   (str (sub x 1)))))
+                   (.join ",")))))
+
+(def anagrams [lst]
+  (= mem (defaultdict list))
+  (for word lst
+    (.append (sub mem (counter-to-str (Counter word))) word))
+  (= rst [])
+  (for [k v] (.items mem)
+    (when (>= (len v) 2)
+      (rst.append v)))
+  (return rst))
+
+(def solution []
+  ;; Load words list
+  (with [(open "./p098_words.txt" "r") as f]
+    (= s (f.read)))
+  (= word-list (json.loads (+ "[" s "]")))
+
+  ;; Get anagrams
+  (-> word-list
+      (anagrams))
+  
+  )
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(when (== __name__ "__main__")
+  (main))
