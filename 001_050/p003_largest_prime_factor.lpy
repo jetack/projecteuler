@@ -1,17 +1,19 @@
-(setv n 600851475143)
+(require lispy.macros *)
 
-(defn sol [n]
-  (setv ret (if (% n 2)
-                1
-                (do (while (= 0 (% n 2))
-                      (//= n 2))
-                    2))
-        i 3)
+(= n 600851475143)
+
+(def sol [n]
+  (= ret (ife (% n 2)
+              1
+              (do (while (== 0 (% n 2))
+                    (//= n 2))
+                  2)))
+  (= i 3)
   (while (<= i n)
-    (if (= 0 (% n i))
-        (do (setv ret i)
-            (while (= 0 (% n i)) (//= n i))))
+    (if (== 0 (% n i))
+        (do (= ret i)
+            (while (== 0 (% n i)) (//= n i))))
     (+= i 2))
-  ret)
+  (return ret))
 
-(sol n)
+(print (sol n))

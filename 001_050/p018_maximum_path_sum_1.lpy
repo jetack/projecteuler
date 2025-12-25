@@ -1,13 +1,14 @@
-(defn parse [s]
-  (lfor l (-> s (.strip) (.split "\n")) (lfor d (l.split " ") (int d))))
+(require lispy.macros *)
 
-(defn sol [parsed]
-  (for [i (range (- (len parsed) 2) -1 -1)]
-    (setv (get parsed i) (lfor (, j d) (enumerate (get parsed i))
-                               (+ d (max (get (get parsed (+ i 1)) j) (get (get parsed (+ i 1)) (+ j 1)))))))
-  (get (get parsed 0) 0))
+(def parse [s]
+  (return [[(int d) for d in (.split (.strip l) " ")] for l in (.split (.strip s) "\n")]))
 
-(setv s "75
+(def sol [parsed]
+  (for i (range (- (len parsed) 2) -1 -1)
+    (= (sub parsed i) [(+ d (max (sub (sub parsed (+ i 1)) j) (sub (sub parsed (+ i 1)) (+ j 1)))) for [j d] in (enumerate (sub parsed i))]))
+  (return (sub (sub parsed 0) 0)))
+
+(= s "75
 95 64
 17 47 82
 18 35 87 10
@@ -23,4 +24,4 @@
 63 66 04 68 89 53 67 30 73 16 69 87 40 31
 04 62 98 27 23 09 70 98 73 93 38 53 60 04 23")
 
-(sol (parse s))
+(print (sol (parse s)))

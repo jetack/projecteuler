@@ -1,36 +1,36 @@
-(defn build-primes [n]
-  (setv sieve (* [True] n))
-  (for [i (range 2)]
-    (setv (get sieve i) False))
-  (for [i (range 2 n)]
-    (if (get sieve i)
-        (for [j (range (* 2 i) n i)]
-          (setv (get sieve j) False))))
-  (sfor i (range n) :if (get sieve i) i))
+(require lispy.macros *)
 
-(defn quad-form [a b]
-  (fn [x] (+ (* x x) (* a x) b)))
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return {, i for i in (range n) if (sub sieve i)}))
 
+(def quad-form [a b]
+  (return (lambda [x] (+ (* x x) (* a x) b))))
 
-(defn count-combo [f primes]
-  (setv i 0)
+(def count-combo [f primes]
+  (= i 0)
   (while (in (f i) primes)
     (+= i 1))
-  i)
+  (return i))
 
-
-(defn sol [am bm]
-  (setv M 0
-        i am
-        j bm
-        primes (build-primes (+ (max am bm) 1)))
-  (for [a (range (- am) (+ am 1))]
-    (for [b (range 2 (+ bm 1))]
-      (setv combo (count-combo (quad-form a b) primes))
+(def sol [am bm]
+  (= M 0)
+  (= i am)
+  (= j bm)
+  (= primes (build-primes (+ (max am bm) 100000))) ;; Increased prime limit to be safe for quad values
+  (for a (range (- am) (+ am 1))
+    (for b (range 2 (+ bm 1))
+      (= combo (count-combo (quad-form a b) primes))
       (if (> combo M)
-          (do (setv M combo
-                    i a
-                    j b)))))
-  (* i j))
+          (do (= M combo)
+              (= i a)
+              (= j b)))))
+  (return (* i j)))
 
-(sol 1000 1000)
+(print (sol 1000 1000))

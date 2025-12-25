@@ -1,15 +1,17 @@
-(setv limit (* 4 (** 10 6)))
+(require lispy.macros *)
 
-(setv a 1
-      b 2
-      ret 0)
+(= limit (* 4 (** 10 6)))
 
-(defn next-fib [a b]
-  (, b (+ a b)))
+(= a 1)
+(= b 2)
+(= ret 0)
+
+(def next-fib [a b]
+  (return [b (+ a b)]))
 
 (while (< b limit)
   (+= ret b)
-  (for [_ (range 3)]
-    (setv (, a b) (next-fib a b))))
+  (for _ (range 3)
+    (= [a b] (next-fib a b))))
 
 (print ret)

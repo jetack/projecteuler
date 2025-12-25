@@ -1,16 +1,17 @@
-(defn sol [lst]
-  (setv d-num 1
-        l 10
-        cur 1
-        ret [])
-  (for [i lst]
+(require lispy.macros *)
+(from functools [reduce])
+
+(def sol [lst]
+  (= d-num 1)
+  (= l 10)
+  (= cur 1)
+  (= ret [])
+  (for i lst
     (while (< (* d-num (- l (// l 10))) (- i cur))
       (+= cur (* d-num (- l (// l 10))))
       (+= d-num 1)
       (*= l 10))
-    (ret.append (int (get (str (+ (// l 10)
-                                  (// (- i cur) d-num)))
-                          (% (- i cur) d-num)))))
-  (reduce * ret))
+    (ret.append (int (sub (str (+ (// l 10) (// (- i cur) d-num))) (% (- i cur) d-num)))))
+  (return (reduce (lambda [x y] (* x y)) ret)))
 
-(sol (lfor i (range 7) (** 10 i)))
+(print (sol [(** 10 i) for i in (range 7)]))

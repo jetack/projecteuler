@@ -1,31 +1,33 @@
-;;; build-primes from 27
-(defn build-primes [n]
-  (setv sieve (* [True] n))
-  (for [i (range 2)]
-    (setv (get sieve i) False))
-  (for [i (range 2 n)]
-    (if (get sieve i)
-        (for [j (range (* 2 i) n i)]
-          (setv (get sieve j) False))))
-  (sfor i (range n) :if (get sieve i) i))
+(require lispy.macros *)
 
-(defn all-circular [p]
-  (setv ret #{p}
-        p-str (str p))
+;;; build-primes from 27
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return {, i for i in (range n) if (sub sieve i)}))
+
+(def all-circular [p]
+  (= ret {, p})
+  (= p-str (str p))
   (if (in "0" p-str)
       (return (set)))
-  (for [i (range 1 (len p-str))]
-    (ret.add (int (+ (get p-str (slice i None))
-                     (get p-str (slice None i))))))
-  ret)
+  (for i (range 1 (len p-str))
+    (ret.add (int (+ (sub p-str [: i None])
+                     (sub p-str [: None i])))))
+  (return ret))
 
-(defn find-circular-primes [primes]
-  (setv ret (set))
-  (for [p (list primes)]
-    (setv circulars (all-circular p))
-    (when (and circulars (not (lfor c circulars :if (not (in c primes)) c)))
-      (setv ret (ret.union circulars)))
+(def find-circular-primes [primes]
+  (= ret (set))
+  (for p (list primes)
+    (= circulars (all-circular p))
+    (if (and circulars (not [c for c in circulars if (not (in c primes))]))
+        (= ret (ret.union circulars)))
     (-= primes circulars))
-  ret)
+  (return ret))
 
 (print (len (find-circular-primes (build-primes (** 10 6)))))

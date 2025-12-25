@@ -1,32 +1,48 @@
-(import [hy.contrib.loop [__trampoline__]])
+(require lispy.macros *)
 
-(defn add-arr [a b]
-  (setv remain 0
-        ret [])
-  (for [i (range (len a))]
-    (setv s (+ (get a i)
-               (get b i)
-               remain))
+(def tco [f]
+  (= active False)
+  (= stored False)
+  (= argstore None)
+  (def wrapper [*args]
+    (nonlocal active stored argstore)
+    (= argstore args)
+    (= stored True)
+    (if (not active)
+        (do (= active True)
+            (while stored
+              (= stored False)
+              (= result (f *argstore)))
+            (= active False)
+            (return result))))
+  (return wrapper))
+
+(def add-arr [a b]
+  (= remain 0)
+  (= ret [])
+  (for i (range (len a))
+    (= s (+ (sub a i)
+            (sub b i)
+            remain))
     (ret.append (% s 10))
-    (setv remain (// s 10)))
-  (for [j (range (len a) (len b))]
-    (setv s (+ (get b j)
-               remain))
+    (= remain (// s 10)))
+  (for j (range (len a) (len b))
+    (= s (+ (sub b j)
+            remain))
     (ret.append (% s 10))
-    (setv remain (// s 10)))
+    (= remain (// s 10)))
   (while remain
     (ret.append (% remain 10))
     (//= remain 10))
-  ret)
+  (return ret))
 
-(with-decorator __trampoline__
-  (defn recur [a b d [n 1]]
+(deco [tco]
+  (def recur [a b d n]
     (if (>= (len a) d)
-        n
-        (recur b (add-arr a b) d (+ n 1)))))
+        (return n)
+        (return (recur b (add-arr a b) d (+ n 1))))))
 
+(def sol [d]
+  (return (recur [1] [1] d 1)))
 
-(defn sol [d]
-  (recur [1] [1] d))
-
-(sol 1000)
+(print (sol 1000))

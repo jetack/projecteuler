@@ -1,30 +1,37 @@
+(require lispy.macros *)
+
+(defmacro do-while [condition *body]
+  (return `(do
+     ~@body
+     (while ~condition
+       ~@body))))
+
 ;;; build-primes from 27
-(defn build-primes [n]
-  (setv sieve (* [True] n))
-  (for [i (range 2)]
-    (setv (get sieve i) False))
-  (for [i (range 2 n)]
-    (if (get sieve i)
-        (for [j (range (* 2 i) n i)]
-          (setv (get sieve j) False))))
-  (sfor i (range n) :if (get sieve i) i))
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return {, i for i in (range n) if (sub sieve i)}))
 
-
-(defn truncatable? [p primes]
+(def truncatable? [p primes]
   (if (< p 10)
-      False
-      (and (left-truncatable? p primes)
-           (right-truncatable? p primes))))
+      (return False))
+  (return (and (left-truncatable? p primes)
+               (right-truncatable? p primes))))
 
-(defn right-truncatable? [p primes]
+(def right-truncatable? [p primes]
   (while p
     (if (not (in p primes))
         (return False))
     (//= p 10))
-  True)
+  (return True))
 
-(defn left-truncatable? [p primes]
-  (setv d 1)
+(def left-truncatable? [p primes]
+  (= d 1)
   (while (<= d p)
     (*= d 10))
   (while p
@@ -32,33 +39,19 @@
         (return False))
     (//= d 10)
     (%= p d))
-  True)
+  (return True))
 
-(defn truncatable-primes [n]
-  (setv primes (build-primes n))
-  (lfor p (sorted (list primes)) :if (truncatable? p primes) p))
+(def truncatable-primes [n]
+  (= primes (build-primes n))
+  (return [p for p in (sorted (list primes)) if (truncatable? p primes)]))
 
-(defmacro do-while [#* args]
-  (setv body (get args (slice None -1))
-        condition (get args -1))
-  `(do
-     ~@body
-     (while ~condition
-       ~@body)))
-
-(defn sol [n]
-  (setv l 100)
-  (do-while
-    (setv lst (truncatable-primes l))
-    (*= l 10)
-    ;; while
-    (< (len lst) n))
+(def sol [n]
+  (= l 100)
+  (= lst [])
+  (do-while (< (len lst) n)
+    (= lst (truncatable-primes l))
+    (*= l 10))
   (print l)
-  (sum lst))
+  (return (sum lst)))
 
-(sol 11)
-
-;; result is 
-;; 10000000
-;; 748317
-;; thus, (len (truncatable-primes 1000000)) should be the answer
+(print (sol 11))

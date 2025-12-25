@@ -1,21 +1,20 @@
-(defn parse [in-str]
-  (-> in-str (.strip) (.split "\n")))
+(require lispy.macros *)
+(from functools [reduce])
 
-(defn preprocess [parsed]
-  (lfor s parsed
-        (get (lfor i (range 0 (len s) 10)
-                   (int (get s (slice i (+ i 10)))))
-             (slice None None -1))))
+(def parse [in-str]
+  (return (.split (.strip in-str) "\n")))
 
-(defn sol [processed]
-  (setv ret 0)
-  (for [l (zip #* processed)]
-    (setv ret (reduce + l ret))
+(def preprocess [parsed]
+  (return [(sub [(int (sub s [: i (+ i 10)])) for i in (range 0 (len s) 10)] [: None None -1]) for s in parsed]))
+
+(def sol [processed]
+  (= ret 0)
+  (for l (zip *processed)
+    (= ret (reduce (lambda [x y] (+ x y)) l ret))
     (print ret)
-    (//= ret (** 10 10))
-    ))
+    (//= ret (** 10 10))))
 
-(setv in-str "37107287533902102798797998220837590246510135740250
+(= in-str "37107287533902102798797998220837590246510135740250
 46376937677490009712648124896970078050417018260538
 74324986199524741059474233309513058123726617309629
 91942213363574161572522430563301811072406154908250

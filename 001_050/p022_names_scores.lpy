@@ -1,17 +1,18 @@
-(import [collections [defaultdict]])
+(require lispy.macros *)
+(from collections [defaultdict])
 
-(setv path "./p022_names.txt")
+(= path "./p022_names.txt")
 
-(defn parse [path]
-  (-> (with [f (open path "r")]
-        (f.readline))
-      (.split ",")
-      (sorted)))
+(def parse [path]
+  (with [(open path "r") as f]
+    (= content (.split (f.readline) ",")))
+  (content.sort)
+  (return content))
 
-(defn name-sum [s]
-  (sum (lfor c s :if (<= (ord "A") (ord c) (ord "Z")) (+ (- (ord c) (ord "A")) 1))))
+(def name-sum [s]
+  (return (sum [(+ (- (ord c) (ord "A")) 1) for c in s if (<= (ord "A") (ord c) (ord "Z"))])))
 
-(defn sol [parsed]
-  (sum (lfor (, i s) (enumerate parsed) (* (+ i 1) (name-sum s)))))
+(def sol [parsed]
+  (return (sum [(* (+ i 1) (name-sum s)) for [i s] in (enumerate parsed)])))
 
-(sol (parse path))
+(print (sol (parse path)))

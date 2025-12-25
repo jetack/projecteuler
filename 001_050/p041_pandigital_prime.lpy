@@ -1,63 +1,62 @@
-(defn build-primes [n]
-  (setv sieve (* [True] n))
-  (for [i (range 2)]
-    (setv (get sieve i) False))
-  (for [i (range 2 n)]
-    (if (get sieve i)
-        (for [j (range (* 2 i) n i)]
-          (setv (get sieve j) False))))
-  (lfor i (range n) :if (get sieve i) i))
+(require lispy.macros *)
 
-(defn prime? [n primes]
-  (for [p primes]
-    (cond [(> (* p p) n) (return True)]
-          [(= (% n p) 0) (return False)]))
-  True)
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return [i for i in (range n) if (sub sieve i)]))
 
-(defmacro/g! travel-permutation [bindings #* body]
-  (setv [argsymbols argvalues] (if bindings (zip #* bindings) [[] []]))
-  (for [[i s] (enumerate ["candidates" "lengths"])]
-    (assert (= (hy.models.Symbol s) (get argsymbols i))))
-  `(do
-     (defn g!fn [~@argsymbols]
-       (setv perm []
-             terminate []
-             max-depth (max lengths)
-             lengths (set lengths))
-       (defn ~g!recur [perm terminate ~@argsymbols [l 0] [d max-depth]]
-         (when (not terminate)
-           (when (in l lengths)
-             ~@body)
-           (when d
-             (for [c (list candidates)]
-               (perm.append c)
-               (candidates.remove c)
-               (setv ret (~g!recur perm terminate ~@argsymbols (+ l 1) (- d 1)))
-               (candidates.add c)
-               (perm.pop))))
-         ret)
-       (~g!recur perm terminate ~@argvalues))
-     (g!fn ~@argvalues)))
+(def prime? [n primes]
+  (for p primes
+    (cond (> (* p p) n) (return True)
+          (== (% n p) 0) (return False)))
+  (return True))
 
-
-(defn lst-to-num [lst]
-  (setv ret 0)
-  (for [d lst]
+(def lst-to-num [lst]
+  (= ret 0)
+  (for d lst
     (*= ret 10)
     (+= ret d))
-  ret)
+  (return ret))
 
-(defn sol [n]
-  (setv primes (build-primes (** 10 (+ 1 (// n 2))))
-        ret 0
-        i n)
+(defmacro with-permutations [perm candidates lengths *body]
+  (return `(do
+     (= __candidates ~candidates)
+     (= __lengths (set ~lengths))
+     (= __max-depth (max ~lengths))
+     (= __terminate [])
+     (= ~perm [])
+     (def __recur [__l __d]
+       (if (not __terminate)
+           (do
+             (if (in __l __lengths)
+                 (do ~@body))
+             (if __d
+                 (for __c (list __candidates)
+                   (.append ~perm __c)
+                   (.remove __candidates __c)
+                   (__recur (+ __l 1) (- __d 1))
+                   (.add __candidates __c)
+                   (.pop ~perm))))))
+     (__recur 0 __max-depth))))
+
+(def sol [n]
+  (= primes (build-primes (int (** 10 (+ 1 (// n 2))))))
+  (= ret 0)
+  (= i n)
   (while (not ret)
-    (setv ret (travel-permutation
-                [[candidates (set (range 1 (+ 1 i)))] [lengths [i]] [primes primes] [ret 0]]
-                (setv p (lst-to-num perm))
-                (when (prime? p primes)
-                  (setv ret (max ret p)))))
+    (= ret-val 0)
+    (with-permutations perm (set (range 1 (+ 1 i))) [i]
+      (= p (lst-to-num perm))
+      (if (prime? p primes)
+          (do (nonlocal ret-val)
+              (= ret-val (max ret-val p)))))
+    (= ret ret-val)
     (-= i 1))
-  ret)
+  (return ret))
 
-(sol 9)
+(print (sol 9))

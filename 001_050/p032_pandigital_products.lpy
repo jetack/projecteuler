@@ -1,56 +1,59 @@
-(defmacro/g! travel-permutation [bindings #* body]
-  (setv [argsymbols argvalues] (if bindings (zip #* bindings) [[] []]))
-  (for [[i s] (enumerate ["candidates" "lengths"])]
-    (assert (= (hy.models.Symbol s) (get argsymbols i))))
-  `(do
-     (defn g!fn [~@argsymbols]
-       (setv perm []
-             terminate []
-             max-depth (max lengths)
-             lengths (set lengths))
-       (defn ~g!recur [perm terminate ~@argsymbols [l 0] [d max-depth]]
-         (when (not terminate)
-           (when (in l lengths)
-             ~@body)
-           (when d
-             (for [c (list candidates)]
-               (perm.append c)
-               (candidates.remove c)
-               (setv ret (~g!recur perm terminate ~@argsymbols (+ l 1) (- d 1)))
-               (candidates.add c)
-               (perm.pop))))
-         ret)
-       (~g!recur perm terminate ~@argvalues))
-     (g!fn ~@argvalues)))
+(require lispy.macros *)
 
-(defn lst-to-num [lst]
-  (setv ret 0)
-  (for [d lst]
+(def lst-to-num [lst]
+  (= ret 0)
+  (for d lst
     (*= ret 10)
     (+= ret d))
-  ret)
+  (return ret))
 
-(defn num-to-set [n]
-  (setv ret (set))
+(def num-to-set [n]
+  (= ret (set))
   (while n
     (ret.add (% n 10))
     (//= n 10))
-  ret)
+  (return ret))
 
-(defn factors-found? [p candidates]
-  (travel-permutation
-    ;; assume multiplicand < multiplier, length of multiplicand lies in [1 2]
-    [[candidates candidates] [lengths [1 2]] [p p] [ret False]]
-    (setv m (lst-to-num perm))
-    (when (and (= (% p m) 0) (= candidates (num-to-set (// p m))))
-      (setv ret True)
-      (terminate.append True))))
+(defmacro with-permutations [perm candidates lengths *body]
+  (return `(do
+     (= __candidates ~candidates)
+     (= __lengths (set ~lengths))
+     (= __max-depth (max ~lengths))
+     (= __terminate [])
+     (= ~perm [])
+     (def __recur [__l __d]
+       (if (not __terminate)
+           (do
+             (if (in __l __lengths)
+                 (do ~@body))
+             (if __d
+                 (for __c (list __candidates)
+                   (.append ~perm __c)
+                   (.remove __candidates __c)
+                   (__recur (+ __l 1) (- __d 1))
+                   (.add __candidates __c)
+                   (.pop ~perm))))))
+     (__recur 0 __max-depth))))
 
-(setv candidates (set (range 1 10)))
+(def factors-found? [p candidates]
+  ;; assume multiplicand < multiplier, length of multiplicand lies in [1 2]
+  (= ret False)
+  (with-permutations perm candidates [1 2]
+    (= m (lst-to-num perm))
+    (if (and (== (% p m) 0) (== candidates (num-to-set (// p m))))
+        (do (nonlocal ret)
+            (= ret True)
+            (__terminate.append True))))
+  (return ret))
 
-(print (sum (travel-permutation
-              ;; since (* 99 99) < 11111, (* 111 111), (* 11 111), (1 1111) > 9 product should be length of 4
-              [[candidates candidates] [lengths [4]] [ret []]]
-              (setv p (lst-to-num perm))
-              (when (factors-found? p candidates)
-                (ret.append p)))))
+(def sol []
+  (= candidates (set (range 1 10)))
+  ;; since (* 99 99) < 11111, (* 111 111), (* 11 111), (1 1111) > 9 product should be length of 4
+  (= ret (set))
+  (with-permutations perm candidates [4]
+    (= p (lst-to-num perm))
+    (if (factors-found? p candidates)
+        (ret.add p)))
+  (return (sum ret)))
+
+(print (sol))

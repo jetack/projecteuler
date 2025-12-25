@@ -1,25 +1,26 @@
+(require lispy.macros *)
 ;;; since 9! * 7 = 2540160, n <= 2540160
 
-(defn factorial [n]
-  (setv ret 1)
+(def factorial [n]
+  (= ret 1)
   (while (> n 1)
     (*= ret n)
     (-= n 1))
-  ret)
+  (return ret))
 
-(defn digit-fac-sum [n factorials]
-  (setv ret 0)
+(def digit-fac-sum [n factorials]
+  (= ret 0)
   (while n
-    (+= ret (get factorials (% n 10)))
+    (+= ret (sub factorials (% n 10)))
     (//= n 10))
-  ret)
+  (return ret))
 
-(defn sol [n]
-  (setv factorials (lfor i (range 10) (factorial i)))
-  (setv ret 0)
-  (for [i (range 10 (+ n 1))]
-    (if (= i (digit-fac-sum i factorials))
+(def sol [n]
+  (= factorials [(factorial i) for i in (range 10)])
+  (= ret 0)
+  (for i (range 10 (+ n 1))
+    (if (== i (digit-fac-sum i factorials))
         (+= ret i)))
-  ret)
+  (return ret))
 
-(sol 2540160)
+(print (sol 2540160))

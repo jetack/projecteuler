@@ -1,52 +1,49 @@
-(import [time [time]])
+(require lispy.macros *)
+(from time [time])
 
-(defmacro do-sth [#* body]
-  (setv [condition body] [(get body -1) (get body (slice None -2))])
-  `(do
+(defmacro do-while [condition *body]
+  (return `(while True
      ~@body
-     (while ~condition
-       ~@body)))
+     (if (not ~condition)
+         (break)))))
 
-(defn pentagon-gen []
-  (setv n 0
-        x -2)
+(def pentagon-gen []
+  (= n 0)
+  (= x -2)
   (while True
     (+= x 3)
     (+= n x)
     (yield n)))
 
-(defn update [lst hsh n]
+(def update [lst hsh n]
   (lst.append n)
   (hsh.add n))
 
-(defn sol []
-  (setv list-mem []
-        hash-mem (set)
-        pen-gen (pentagon-gen)
-        rst -1)
-  (for [_ (range 4)]
+(def sol []
+  (= list-mem [])
+  (= hash-mem (set))
+  (= pen-gen (pentagon-gen))
+  (= rst -1)
+  (for _ (range 4)
     (update list-mem hash-mem (next pen-gen)))
-  (setv i 1)
-  (do-sth
-    (setv iv (get list-mem i))
-    (setv j (- i 1))
-    (setv jv (get list-mem j))
-    (while (< (get list-mem -1) (+ jv iv))
+  (= i 1)
+  (do-while (or (< rst 0) (> rst (+ (* 3 i) 1)))
+    (= iv (sub list-mem i))
+    (= j (- i 1))
+    (= jv (sub list-mem j))
+    (while (< (sub list-mem -1) (+ jv iv))
       (update list-mem hash-mem (next pen-gen)))
-    (do-sth
+    (do-while (and (> j 0) (or (< rst 0) (< (- iv jv) rst)))
       (if (and (in (- iv jv) hash-mem)
                (in (+ iv jv) hash-mem))
-          (setv rst (if (< rst 0)
-                        (- iv jv)
-                        (min rst (- iv jv)))))
+          (= rst (ife (< rst 0)
+                      (- iv jv)
+                      (min rst (- iv jv)))))
       (-= j 1)
-      (setv jv (get list-mem j))
-      :while (and (> j 0) (or (< rst 0) (< (- iv jv) rst))))
-    (+= i 1)
-    :while (or (< rst 0) (> rst (+ (* 3 i) 1))))
-  rst)
+      (= jv (sub list-mem j)))
+    (+= i 1))
+  (return rst))
 
-(do
-  (setv t (time))
-  (print (sol))
-  (print (- (time) t)))
+(= t (time))
+(print (sol))
+(print "elapsed:" (- (time) t))

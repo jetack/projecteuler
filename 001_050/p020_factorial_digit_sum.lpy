@@ -1,15 +1,15 @@
-(import [hy.contrib.loop [__trampoline__]])
+(require lispy.macros *)
 
-(with-decorator __trampoline__
-  (defn fact [n [ret 1]]
-    (if (< n 2) ret
-        (fact (- n 1) (* ret n)))))
+(def fact [n :ret 1]
+  (if (< n 2)
+      (return ret)
+      (return (fact (- n 1) (* ret n)))))
 
-(defn digit-sum [n]
-  (setv ret 0)
+(def digit-sum [n]
+  (= ret 0)
   (while n
     (+= ret (% n 10))
     (//= n 10))
-  ret)
+  (return ret))
 
-(digit-sum (fact 100))
+(print (digit-sum (fact 100)))

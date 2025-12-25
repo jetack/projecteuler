@@ -1,26 +1,27 @@
-(import [math [sqrt]])
+(require lispy.macros *)
+(from math [sqrt])
 
-(defn parse [path]
-  (with [f (open path "r")]
-    (as-> (f.readline) a
-        (a.split ",")
-        (map (fn [x] (x.strip "\"")) a)
-        (list a))))
+(def parse [path]
+  (with [(open path "r") as f]
+    (= a (.readline f))
+    (= a (.split a ","))
+    (= a [(.strip x (chr 34)) for x in a])
+    (return a)))
 
-(defn triangle? [t]
-  (setv n (int (sqrt (* 2 t))))
-  (= (* 2 t) (* n (+ n 1))))
+(def triangle? [t]
+  (= n (int (sqrt (* 2 t))))
+  (return (== (* 2 t) (* n (+ n 1)))))
 
-(defn word-score [word]
-  (setv ret (len word))
-  (for [c word]
+(def word-score [word]
+  (= ret (len word))
+  (for c word
     (+= ret (- (ord c) (ord "A"))))
-  ret)
+  (return ret))
 
-(defn triangle-words [lst]
-  (lfor word lst :if (triangle? (word-score word)) word))
+(def triangle-words [lst]
+  (return [word for word in lst if (triangle? (word-score word))]))
 
-(defn sol [path]
-  (len (triangle-words (parse path))))
+(def sol [path]
+  (return (len (triangle-words (parse path)))))
 
-(sol "./p042_words.txt")
+(print (sol "./p042_words.txt"))

@@ -1,55 +1,48 @@
-(require [hy.contrib.loop [loop]])
+(require lispy.macros *)
+(from functools [reduce])
 
-(defn parse [s]
-  (lfor l (-> s (.strip) (.split "\n")) (lfor d (-> l (.strip) (.split)) (int d))))
+(def parse [s]
+  (return [[(int d) for d in (.split (.strip l))] for l in (.split (.strip s) "\n")]))
 
-(defn get-val [g i j]
-  (get (get g j) i))
+(def get-val [g i j]
+  (return (sub (sub g j) i)))
 
-(defn horizontal [g i j]
-  (setv d (len g))
+(def horizontal [g i j]
+  (= d (len g))
   (if (> i (- d 4))
-      -1
-      (reduce * (lfor k (range 4) (get-val g (+ i k) j)))))
+      (return -1)
+      (return (reduce (lambda [x y] (* x y)) [(get-val g (+ i k) j) for k in (range 4)]))))
 
-(defn vertical [g i j]
-  (setv d (len g))
+(def vertical [g i j]
+  (= d (len g))
   (if (> j (- d 4))
-      -1
-      (reduce * (lfor k (range 4) (get-val g i (+ j k))))))
+      (return -1)
+      (return (reduce (lambda [x y] (* x y)) [(get-val g i (+ j k)) for k in (range 4)]))))
 
-(defn diagonal1 [g i j]
-  (setv d (len g))
+(def diagonal1 [g i j]
+  (= d (len g))
   (if (or (> j (- d 4))
           (> i (- d 4)))
-      -1
-      (reduce * (lfor k (range 4) (get-val g (+ i k) (+ j k))))))
+      (return -1)
+      (return (reduce (lambda [x y] (* x y)) [(get-val g (+ i k) (+ j k)) for k in (range 4)]))))
 
-(defn diagonal2 [g i j]
-  (setv d (len g))
+(def diagonal2 [g i j]
+  (= d (len g))
   (if (or (> j (- d 4))
           (< i 3))
-      -1
-      (reduce * (lfor k (range 4) (get-val g (- i k) (+ j k))))))
+      (return -1)
+      (return (reduce (lambda [x y] (* x y)) [(get-val g (- i k) (+ j k)) for k in (range 4)]))))
 
+(def sol [g]
+  (= d (len g))
+  (= ret 0)
+  (for j (range d)
+    (for i (range d)
+      (for f [horizontal vertical diagonal1 diagonal2]
+        (= ret (max ret (f g i j))))))
+  (return ret))
 
-(defn sol [g]
-  (setv d (len g))
-  (defn loop-for-j [i]
-    (loop [[ret 0] [j 0]]
-          (if (>= j d)
-              ret
-              (recur (max ret #* (lfor f [horizontal vertical diagonal1 diagonal2] (f g i j)))
-                     (+ j 1)))))
-  (defn loop-for-i [j]
-    (loop [[ret 0] [i 0]]
-          (if (>= i d)
-              ret
-              (recur (max ret (loop-for-j i)) (+ i 1)))))
-
-  (loop-for-i g))
-
-(setv s "08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
+(= s "08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
 49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00
 81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65
 52 70 95 23 04 60 11 42 69 24 68 56 01 32 56 71 37 02 36 91
@@ -70,4 +63,4 @@
 20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
 01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48")
 
-(sol (parse s))
+(print (sol (parse s)))

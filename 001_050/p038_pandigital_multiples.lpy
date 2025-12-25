@@ -1,59 +1,61 @@
-(defmacro/g! travel-permutation [bindings #* body]
-  (setv [argsymbols argvalues] (if bindings (zip #* bindings) [[] []]))
-  (for [[i s] (enumerate ["candidates" "lengths"])]
-    (assert (= (hy.models.Symbol s) (get argsymbols i))))
-  `(do
-     (defn g!fn [~@argsymbols]
-       (setv perm []
-             terminate []
-             max-depth (max lengths)
-             lengths (set lengths))
-       (defn ~g!recur [perm terminate ~@argsymbols [l 0] [d max-depth]]
-         (when (not terminate)
-           (when (in l lengths)
-             ~@body)
-           (when d
-             (for [c (list candidates)]
-               (perm.append c)
-               (candidates.remove c)
-               (setv ret (~g!recur perm terminate ~@argsymbols (+ l 1) (- d 1)))
-               (candidates.add c)
-               (perm.pop))))
-         ret)
-       (~g!recur perm terminate ~@argvalues))
-     (g!fn ~@argvalues)))
+(require lispy.macros *)
 
-(defn lst-to-num [lst]
-  (setv ret 0)
-  (for [d lst]
+(def lst-to-num [lst]
+  (= ret 0)
+  (for d lst
     (*= ret 10)
     (+= ret d))
-  ret)
-(defn num-to-set [n]
-  (setv ret (set))
+  (return ret))
+
+(def num-to-set [n]
+  (= ret (set))
   (while n
     (ret.add (% n 10))
     (//= n 10))
-  ret)
+  (return ret))
 
-(defn propagate [p]
-  (setv ret (str p)
-        i 2)
+(defmacro with-permutations [perm candidates lengths *body]
+  (return `(do
+     (= __candidates ~candidates)
+     (= __lengths (set ~lengths))
+     (= __max-depth (max ~lengths))
+     (= __terminate [])
+     (= ~perm [])
+     (def __recur [__l __d]
+       (if (not __terminate)
+           (do
+             (if (in __l __lengths)
+                 (do ~@body))
+             (if __d
+                 (for __c (list __candidates)
+                   (.append ~perm __c)
+                   (.remove __candidates __c)
+                   (__recur (+ __l 1) (- __d 1))
+                   (.add __candidates __c)
+                   (.pop ~perm))))))
+     (__recur 0 __max-depth))))
+
+(def propagate [p]
+  (= ret (str p))
+  (= i 2)
   (while (< (len ret) 9)
     (+= ret (str (* p i)))
     (+= i 1))
-  (int ret))
+  (return (int ret)))
 
-(defn pandigital? [n [l 9]]
-  (and (= (len (str n)) l)
-       (= (num-to-set n) (set (range 1 (+ 1 l))))))
+(def pandigital? [n :l 9]
+  (return (and (== (len (str n)) l)
+               (== (num-to-set n) (set (range 1 (+ 1 l)))))))
 
-(setv candidates (set (range 1 10)))
+(def sol []
+  (= candidates (set (range 1 10)))
+  (= ret 0)
+  (with-permutations perm candidates (range 1 5)
+    (= p (lst-to-num perm))
+    (= prop (propagate p))
+    (if (pandigital? prop)
+        (do (nonlocal ret)
+            (= ret (max ret prop)))))
+  (return ret))
 
-(print (travel-permutation
-         ;; since n > 1, lengths < 5
-         [[candidates candidates] [lengths (range 1 5)] [ret 0]]
-         (setv p (lst-to-num perm)
-               prop (propagate p))
-         (when (pandigital? prop)
-           (setv ret (max ret prop)))))
+(print (sol))

@@ -1,17 +1,19 @@
-(defn all-primes-till [n]
-  (setv sieve (+ (* (min 2 n) [0]) (* (- n 1) [1])))
-  (for [i (range 2 (+ n 1))]
-    (for [j (range (* 2 i) (+ n 1) i)]
-      (setv (get sieve j) 0)))
-  (lfor i (range (+ n 1)) :if (get sieve i) i))
+(require lispy.macros *)
 
-(defn sol [n]
-  (setv ret 1)
-  (for [p (all-primes-till n)]
-    (setv f 1)
+(def all-primes-till [n]
+  (= sieve (+ (* (min 2 n) [0]) (* (- n 1) [1])))
+  (for i (range 2 (+ n 1))
+    (for j (range (* 2 i) (+ n 1) i)
+      (= (sub sieve j) 0)))
+  (return [i for i in (range (+ n 1)) if (sub sieve i)]))
+
+(def sol [n]
+  (= ret 1)
+  (for p (all-primes-till n)
+    (= f 1)
     (while (<= f (/ n p))
       (*= f p))
     (*= ret f))
-  ret)
+  (return ret))
 
-(sol 20)
+(print (sol 20))

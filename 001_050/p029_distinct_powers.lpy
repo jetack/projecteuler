@@ -1,33 +1,35 @@
-(defn build-primes [n]
-  (setv sieve (* [True] n))
-  (for [i (range 2)]
-    (setv (get sieve i) False))
-  (for [i (range 2 n)]
-    (if (get sieve i)
-        (for [j (range (* 2 i) n i)]
-          (setv (get sieve j) False))))
-  (sfor i (range n) :if (get sieve i) i))
+(require lispy.macros *)
 
-(defn factorize [n primes]
-  (setv ret (* [0] (len primes)))
-  (for [(, i p) (enumerate primes)]
-    (while (= 0 (% n p))
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return [i for i in (range n) if (sub sieve i)]))
+
+(def factorize [n primes]
+  (= ret (* [0] (len primes)))
+  (for [i p] (enumerate primes)
+    (while (== 0 (% n p))
       (//= n p)
-      (+= (get ret i) 1)))
-  ret)
+      (+= (sub ret i) 1)))
+  (return ret))
 
-(defn coord-to-str [coord]
-  (.join " " (map str coord)))
+(def coord-to-str [coord]
+  (return (.join " " (map str coord))))
 
-(defn power-coord [coord e]
-  (lfor c coord (* e c)))
+(def power-coord [coord e]
+  (return [(* e c) for c in coord]))
 
-(defn sol [n]
-  (setv mem (set))
-  (setv primes (build-primes (+ n 1)))
-  (for [a (range 2 (+ n 1))]
-    (for [b (range 2 (+ n 1))]
+(def sol [n]
+  (= mem (set))
+  (= primes (build-primes (+ n 1)))
+  (for a (range 2 (+ n 1))
+    (for b (range 2 (+ n 1))
       (mem.add (coord-to-str (power-coord (factorize a primes) b)))))
-  (len mem))
+  (return (len mem)))
 
-(sol 100)
+(print (sol 100))

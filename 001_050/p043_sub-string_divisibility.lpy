@@ -1,41 +1,44 @@
-(defmacro/g! travel-permutation [bindings #* body]
-  (setv [argsymbols argvalues] (if bindings (zip #* bindings) [[] []]))
-  (for [[i s] (enumerate ["candidates" "lengths"])]
-    (assert (= (hy.models.Symbol s) (get argsymbols i))))
-  `(do
-     (defn g!fn [~@argsymbols]
-       (setv perm []
-             terminate []
-             max-depth (max lengths)
-             lengths (set lengths))
-       (defn ~g!recur [perm terminate ~@argsymbols [l 0] [d max-depth]]
-         (when (not terminate)
-           (when (in l lengths)
-             ~@body)
-           (when d
-             (for [c (list candidates)]
-               (perm.append c)
-               (candidates.remove c)
-               (setv ret (~g!recur perm terminate ~@argsymbols (+ l 1) (- d 1)))
-               (candidates.add c)
-               (perm.pop))))
-         ret)
-       (~g!recur perm terminate ~@argvalues))
-     (g!fn ~@argvalues)))
+(require lispy.macros *)
 
-(defn lst-to-num [lst]
-  (setv ret 0)
-  (for [d lst]
+(def lst-to-num [lst]
+  (= ret 0)
+  (for d lst
     (*= ret 10)
     (+= ret d))
-  ret)
+  (return ret))
 
-(setv candidates (set (range 10)))
+(defmacro with-permutations [perm candidates lengths *body]
+  (return `(do
+     (= __candidates ~candidates)
+     (= __lengths (set ~lengths))
+     (= __max-depth (max ~lengths))
+     (= __terminate [])
+     (= ~perm [])
+     (def __recur [__l __d]
+       (if (not __terminate)
+           (do
+             (if (in __l __lengths)
+                 (do ~@body))
+             (if __d
+                 (for __c (list __candidates)
+                   (.append ~perm __c)
+                   (.remove __candidates __c)
+                   (__recur (+ __l 1) (- __d 1))
+                   (.add __candidates __c)
+                   (.pop ~perm))))))
+     (__recur 0 __max-depth))))
 
-(sum (travel-permutation
-       [[candidates candidates] [lengths [4 5 6 7 8 9 10]] [ret []] [primes [2 3 5 7 11 13 17]]]
-       (setv p (lst-to-num (get perm (slice -3 None))))
-       (if (% p (get primes (- l 4)))
-           (return ret))
-       (if (= l 10)
-           (ret.append (lst-to-num perm)))))
+(def sol []
+  (= candidates (set (range 10)))
+  (= primes [2 3 5 7 11 13 17])
+  (= ret [])
+  (with-permutations perm candidates (range 4 11)
+    (= p (lst-to-num (sub perm [: -3 None])))
+    (if (% p (sub primes (- (len perm) 4)))
+        (return))
+    (if (== (len perm) 10)
+        (do (ret.append (lst-to-num perm))
+            (return))))
+  (return (sum ret)))
+
+(print (sol))

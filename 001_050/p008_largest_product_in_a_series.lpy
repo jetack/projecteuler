@@ -1,6 +1,7 @@
-(require [hy.contrib.loop [loop]])
+(require lispy.macros *)
+(from functools [reduce])
 
-(setv inp "73167176531330624919225119674426574742355349194934
+(= inp "73167176531330624919225119674426574742355349194934
 96983520312774506326239578318016984801869478851843
 85861560789112949495459501737958331952853208805511
 12540698747158523863050715693290963295227443043557
@@ -21,14 +22,15 @@
 05886116467109405077541002256983155200055935729725
 71636269561882670428252483600823257530420752963450")
 
-(defn parse-input [s]
-  (lfor c s :if (!= c "\n") (int c)))
+(def parse-input [s]
+  (return [(int c) for c in s if (!= c "\n")]))
 
-(defn sol [parsed l]
-  (setv n (len parsed))
-  (loop [[ret 0] [i 0]]
-        (if (> i (- n l))
-            ret
-            (recur (max ret (reduce * (get parsed (slice i (+ i l))))) (+ i 1)))))
+(def sol [parsed l]
+  (= n (len parsed))
+  (= ret 0)
+  (for i (range (+ (- n l) 1))
+    (= slice-prod (reduce (lambda [x y] (* x y)) (sub parsed [: i (+ i l)])))
+    (= ret (max ret slice-prod)))
+  (return ret))
 
-(sol (parse-input inp) 13)
+(print (sol (parse-input inp) 13))
