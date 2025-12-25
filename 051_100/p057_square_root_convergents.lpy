@@ -1,0 +1,21 @@
+(require lispy.macros *)
+
+(def frac-gen [n]
+  (= numer 3)
+  (= denom 2)
+  (while n
+    (yield [numer denom])
+    (-= n 1)
+    (= [numer denom] [(+ numer denom denom) (+ numer denom)])))
+
+(def sol [n]
+  (= rst 0)
+  (= counter 10)
+  (for [numer denom] (frac-gen n)
+    (while (<= counter denom)
+      (*= counter 10))
+    (if (>= numer counter)
+        (+= rst 1)))
+  (return rst))
+
+(print (sol 1000))

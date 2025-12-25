@@ -1,0 +1,57 @@
+(require lispy.macros *)
+(from time [time])
+(from collections [defaultdict])
+(from functools [reduce])
+
+(def prime? [n all-p-below]
+  (for p all-p-below
+    (cond (> (* p p) n) (break)
+          (== 0 (% n p)) (return False)))
+  (return True))
+
+;; ;;; while version
+(def prime-update [n primes]
+  (if (is primes None)
+      (= primes [2 3]))
+  (= i (+ (sub primes -1) 2))
+  (while (<= (* i i) n)
+    (if (prime? i primes)
+        (primes.append i))
+    (+= i 2))
+  (return primes))
+
+(def exponents [n primes]
+  (= ret (defaultdict int))
+  (for [idx p] (enumerate primes)
+    (if (> (* p p) n) (break))
+    (while (== 0 (% n p))
+      (+= (sub ret p) 1)
+      (//= n p)))
+  (if (> n 1)
+      (+= (sub ret n) 1))
+  (return ret))
+
+(def merge-exponents [e1 e2]
+  (for [k v] (.items e2)
+    (+= (sub e1 k) v))
+  (return e1))
+
+(def count-div [exponents]
+  (return (reduce (lambda [x y] (* x y)) [(+ v 1) for [k v] in (.items exponents)])))
+
+(def sol [n]
+  (= primes [2 3])
+  (= i 2)
+  (= num-div -1)
+  (while (<= num-div n)
+    (prime-update (+ i 1) primes)
+    (= [a b] [i (+ i 1)])
+    (if (% i 2) (//= b 2) (//= a 2))
+    (= num-div (count-div (merge-exponents (exponents a primes)
+                                              (exponents b primes))))
+    (+= i 1))
+  (return (* a b)))
+
+(= t (time))
+(print (sol 500))
+(print (- (time) t))

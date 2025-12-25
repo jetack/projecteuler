@@ -1,0 +1,30 @@
+(require lispy.macros *)
+
+(def non-zero-digits [n]
+  (= ret [])
+  (while n
+    (= r (% n 10))
+    (if r (ret.append (% n 10))) 
+    (//= n 10))
+  (return ret))
+
+(def limit [n]
+  (= 9-to-n (** 9 n))
+  (= i 1)
+  (while (< (** 10 i) (* i 9-to-n))
+    (+= i 1))
+  (return i))
+
+(def nth-sum [digits n]
+  (return (sum [(** d n) for d in digits])))
+
+(def sol [n]
+  (= ret [])
+  (for i (range (** 10 (limit n)))
+    (= nz-digits (non-zero-digits i))
+    (if (and (> (len nz-digits) 1)
+             (== i (nth-sum nz-digits n)))
+        (ret.append i)))
+  (return (sum ret)))
+
+(print (sol 5))

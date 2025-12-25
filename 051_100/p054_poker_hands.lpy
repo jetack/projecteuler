@@ -1,0 +1,84 @@
+(require lispy.macros *)
+
+(from time [time])
+(from collections [Counter defaultdict])
+
+(def char-to-num [c]
+  (= d {"T" 10 "J" 11 "Q" 12 "K" 13 "A" 14})
+  (return (ife (in c d)
+               (sub d c)
+               (int c))))
+
+(def parse-hand [hand]
+  (= suits (set))
+  (= nums [])
+  (for card hand
+    (suits.add (sub card 1))
+    (nums.append (char-to-num (sub card 0))))
+  (= c2num (defaultdict list))
+  (for [n c] (.items (Counter nums))
+    (.append (sub c2num c) n))
+  (for v (c2num.values)
+    (v.sort))
+  (return [(== 1 (len suits)) (sorted nums :reverse True) c2num]))
+
+(def straight? [nums]
+  (for i (range 4)
+    (if (!= (sub nums i) (+ (sub nums (+ i 1)) 1))
+        (return False)))
+  (return True))
+
+(def four-card? [cnt]
+  (return (ife (in 4 cnt)
+               [True (sub cnt 4)]
+               [False None])))
+
+(def house? [cnt]
+  (return (ife (and (in 3 cnt) (in 2 cnt))
+               [True [(sub cnt 3) (sub cnt 2)]]
+               [False None])))
+
+(def three-card? [cnt]
+  (return (ife (in 3 cnt)
+               [True (sub cnt 3)]
+               [False None])))
+
+(def calc-hand [hand]
+  (= [f? nums cnt] (parse-hand hand))
+  (= s? (straight? nums))
+  (if (and s? f?)
+      (return [8 nums]))
+  (= [made? rep] (four-card? cnt))
+  (if made?
+      (return [7 nums]))
+  (= [made? rep] (house? cnt))
+  (if made?
+      (return [6 rep nums]))
+  (if f?
+      (return [5 nums]))
+  (if s?
+      (return [4 nums]))
+  (= [made? rep] (three-card? cnt))
+  (if made?
+      (return [3 rep nums]))
+  (= pairs (sub cnt 2))
+  (return [(len pairs) pairs nums]))
+
+(def leftwin? [cards]
+  (= left-hand (sub cards [: None 5]))
+  (= right-hand (sub cards [: 5 None]))
+  (= left-stat (calc-hand left-hand))
+  (= right-stat (calc-hand right-hand))
+  (return (> left-stat right-stat)))
+
+(def solution []
+  (with [(open "./p054_poker.txt") as f]
+    (= lines (f.readlines)))
+  (return (sum [(leftwin? (.split (.strip line) " ")) for line in lines])))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(main)

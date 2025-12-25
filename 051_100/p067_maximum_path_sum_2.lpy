@@ -1,0 +1,16 @@
+(require lispy.macros *)
+
+(def parse [lst]
+  (return [[(int d) for d in (l.split " ")] for l in lst]))
+
+(def sol [parsed]
+  (for i (range (- (len parsed) 2) -1 -1)
+    (= (sub parsed i) [(+ d (max (sub (sub parsed (+ i 1)) j) (sub (sub parsed (+ i 1)) (+ j 1))))
+                       for [j d] in (enumerate (sub parsed i))]))
+  (return (sub (sub parsed 0) 0)))
+
+(def load-inputs [path]
+  (with [(open path "r") as f]
+    (return (f.readlines))))
+
+(print (sol (parse (load-inputs "./p067_triangle.txt"))))

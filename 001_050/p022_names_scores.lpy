@@ -1,0 +1,18 @@
+(require lispy.macros *)
+(from collections [defaultdict])
+
+(= path "./p022_names.txt")
+
+(def parse [path]
+  (with [(open path "r") as f]
+    (= content (.split (f.readline) ",")))
+  (content.sort)
+  (return content))
+
+(def name-sum [s]
+  (return (sum [(+ (- (ord c) (ord "A")) 1) for c in s if (<= (ord "A") (ord c) (ord "Z"))])))
+
+(def sol [parsed]
+  (return (sum [(* (+ i 1) (name-sum s)) for [i s] in (enumerate parsed)])))
+
+(print (sol (parse path)))

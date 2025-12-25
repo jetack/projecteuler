@@ -1,0 +1,40 @@
+(require lispy.macros *)
+(from collections [defaultdict])
+
+(def build-primes [primes limit]
+  (for i (range (+ (sub primes -1) 2) limit 2)
+    (for p primes
+      (cond (> (* p p) i) (do (primes.append i) (break))
+            (== 0 (% i p)) (break))))
+  (return primes))
+
+(def build-dict [primes d]
+  (= rst (defaultdict list))
+  (for p primes
+    (if (> p (** 10 (- d 1)))
+        (.append (sub rst (.join "" (sorted (list (str p))))) p)))
+  (return rst))
+
+(def find-sequence [lst]
+  (= rst [])
+  (for i (range (- (len lst) 2))
+    (for j (range (+ i 1) (- (len lst) 0)) ;; Corrected range to len(lst)
+      (= iv (sub lst i))
+      (= jv (sub lst j))
+      (if (in (+ jv (- jv iv)) lst)
+          (rst.append [iv jv (+ jv (- jv iv))]))))
+  (return rst))
+
+(def wanted-form [lst]
+  (return (.join "" (map str lst))))
+
+(def sol [d]
+  (= primes (build-primes [2 3] (** 10 d)))
+  (= categorized (build-dict primes d))
+  (for [digits d-primes] (.items categorized)
+    (= found (find-sequence d-primes))
+    (if found
+        (for seq found
+          (print (wanted-form seq))))))
+
+(sol 4)

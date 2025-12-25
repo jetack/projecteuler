@@ -1,0 +1,36 @@
+(require lispy.macros *)
+
+(def next-term [n]
+  (if (% n 2)
+      (return (+ (* 3 n) 1))
+      (return (// n 2))))
+
+(def sol [n]
+  (= mem {})
+  ;; deal with power of 2
+  (= i 1)
+  (= l 1)
+  (while (< i n)
+    (= (sub mem i) l)
+    (+= l 1)
+    (<<= i 1))
+  ;; deal with others
+  (for i (range 1 n)
+    (= j i)
+    (= stack [])
+    (while (and (> j 1) (not (in j mem)))
+      (stack.append j)
+      (= j (next-term j)))
+    (= l (sub mem j))
+    (while stack
+      (+= l 1)
+      (= (sub mem (stack.pop)) l)))
+  ;; find longest
+  (= ret 0)
+  (= M 0)
+  (for i (range 1 n)
+    (if (> (sub mem i) M)
+        (= [ret M] [i (sub mem i)])))
+  (return ret))
+
+(print (sol (** 10 6)))

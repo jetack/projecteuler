@@ -1,0 +1,51 @@
+(require lispy.macros *)
+
+;;; Cpython 27s, pypy 800ms
+
+(def tco [f]
+  (= active False)
+  (= stored False)
+  (= argstore None)
+  (def wrapper [*args]
+    (nonlocal active stored argstore)
+    (= argstore args)
+    (= stored True)
+    (if (not active)
+        (do (= active True)
+            (while stored
+              (= stored False)
+              (= result (f *argstore)))
+            (= active False)
+            (return result))))
+  (return wrapper))
+
+(from functools [lru_cache])
+(from time [time])
+
+(def square-digit-sum [n]
+  (= rst 0)
+  (while n
+    (+= rst (** (% n 10) 2))
+    (//= n 10))
+  (return rst))
+
+(deco [tco]
+  (def which-chain? [ds]
+    (return (ife (or (== ds 1) (== ds 89))
+                 ds
+                 (which-chain? (square-digit-sum ds))))))
+
+(deco [(lru_cache :maxsize None)]
+  (def cached-which-chain? [ds]
+    (return (which-chain? ds))))
+
+(def sol [n]
+  (= rst 0)
+  (for i (range 1 n)
+    (if (== 89 (cached-which-chain? (square-digit-sum i)))
+        (+= rst 1)))
+  (return rst))
+
+(= t (time))
+(print (sol (** 10 7)))
+(print (- (time) t))

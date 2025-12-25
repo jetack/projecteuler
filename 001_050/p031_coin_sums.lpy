@@ -1,0 +1,15 @@
+(require lispy.macros *)
+
+(def recur [amount cur coins]
+  (= coin (sub coins cur))
+  (= cnt 0)
+  (if (== cur 0)
+      (return (== (% amount coin) 0))
+      (do (for i (range (+ (// amount coin) 1))
+            (+= cnt (recur (- amount (* i coin)) (- cur 1) coins)))
+          (return cnt))))
+
+(def sol [amount coins]
+  (return (recur amount (- (len coins) 1) coins)))
+
+(print (sol 200 [1 2 5 10 20 50 100 200]))

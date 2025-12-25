@@ -1,0 +1,35 @@
+(require lispy.macros *)
+
+(from time [time])
+
+(def prime? [n]
+  (if (== 0 (% n 2))
+      (return False)
+      (do (= d 3)
+          (while (<= (* d d) n)
+            (if (== (% n d) 0)
+                (return False))
+            (+= d 2))
+          (return True))))
+
+(def ratio [cnt n]
+  (return (/ cnt (+ (* 4 n) 1))))
+
+(def sol [thr]
+  (= cnt 3)
+  (= n 1)
+  (= cur 9)
+  (while (> (ratio cnt n) thr)
+    (+= n 1)
+    (for _ (range 3)
+      (+= cur (* 2 n))
+      (if (prime? cur)
+          (+= cnt 1)))
+    (+= cur (* 2 n)))
+  (return (+ 1 (* 2 n))))
+
+(= t (time))
+(print (sol 0.1))
+(print (- (time) t))
+
+;;; 600ms in pypy

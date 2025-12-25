@@ -1,0 +1,44 @@
+(require lispy.macros *)
+
+(def lst-to-num [lst]
+  (= ret 0)
+  (for d lst
+    (*= ret 10)
+    (+= ret d))
+  (return ret))
+
+(defmacro with-permutations [perm candidates lengths *body]
+  (return `(do
+     (= __candidates ~candidates)
+     (= __lengths (set ~lengths))
+     (= __max-depth (max ~lengths))
+     (= __terminate [])
+     (= ~perm [])
+     (def __recur [__l __d]
+       (if (not __terminate)
+           (do
+             (if (in __l __lengths)
+                 (do ~@body))
+             (if __d
+                 (for __c (list __candidates)
+                   (.append ~perm __c)
+                   (.remove __candidates __c)
+                   (__recur (+ __l 1) (- __d 1))
+                   (.add __candidates __c)
+                   (.pop ~perm))))))
+     (__recur 0 __max-depth))))
+
+(def sol []
+  (= candidates (set (range 10)))
+  (= primes [2 3 5 7 11 13 17])
+  (= ret [])
+  (with-permutations perm candidates (range 4 11)
+    (= p (lst-to-num (sub perm [: -3 None])))
+    (if (% p (sub primes (- (len perm) 4)))
+        (return))
+    (if (== (len perm) 10)
+        (do (ret.append (lst-to-num perm))
+            (return))))
+  (return (sum ret)))
+
+(print (sol))

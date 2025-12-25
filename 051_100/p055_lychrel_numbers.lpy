@@ -1,0 +1,22 @@
+(require lispy.macros *)
+
+(defmacro do-while [condition *body]
+  (return `(while True
+     ~@body
+     (if (not ~condition)
+         (break)))))
+
+(def palindrome? [n]
+  (return (== (str n) (sub (str n) [: None None -1]))))
+
+(def lychrel? [n]
+  (= limit 50)
+  (do-while (and limit (not (palindrome? n)))
+    (= n (+ n (int (sub (str n) [: None None -1]))))
+    (-= limit 1))
+  (return (== limit 0)))
+
+(def sol [n]
+  (return (len (list (filter lychrel? (range 10000))))))
+
+(print (sol 10000))

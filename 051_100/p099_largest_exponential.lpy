@@ -1,0 +1,15 @@
+(require lispy.macros *)
+
+(from math [log])
+
+(def parse [path]
+  (with [(open path "r") as f]
+    (return [(list (map int (.split (.strip x) ","))) for x in (f.readlines)])))
+
+(def project [base exponent]
+  (return (+ (log exponent) (log (log base)))))
+
+(def sol [parsed]
+  (return (max (range (len parsed)) :key (lambda [i] (project *(sub parsed i))))))
+
+(print (+ 1 (sol (parse "./p099_base_exp.txt"))))

@@ -1,0 +1,26 @@
+(require lispy.macros *)
+
+(= n 10001)
+
+(def is-prime? [n]
+  (if (not (% n 2))
+      (return False))
+  (= f 3)
+  (while (<= (* f f) n)
+    (if (not (% n f))
+        (return False))
+    (+= f 2))
+  (return True))
+
+(def n-th-prime [n]
+  (if (== n 1)
+      (return 2))
+  (= cnt 1)
+  (= i 3)
+  (while (< cnt n)
+    (if (is-prime? i)
+        (+= cnt 1))
+    (+= i 2))
+  (return (- i 2)))
+
+(print (n-th-prime n))

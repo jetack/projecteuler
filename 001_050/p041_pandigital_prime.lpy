@@ -1,0 +1,62 @@
+(require lispy.macros *)
+
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return [i for i in (range n) if (sub sieve i)]))
+
+(def prime? [n primes]
+  (for p primes
+    (cond (> (* p p) n) (return True)
+          (== (% n p) 0) (return False)))
+  (return True))
+
+(def lst-to-num [lst]
+  (= ret 0)
+  (for d lst
+    (*= ret 10)
+    (+= ret d))
+  (return ret))
+
+(defmacro with-permutations [perm candidates lengths *body]
+  (return `(do
+     (= __candidates ~candidates)
+     (= __lengths (set ~lengths))
+     (= __max-depth (max ~lengths))
+     (= __terminate [])
+     (= ~perm [])
+     (def __recur [__l __d]
+       (if (not __terminate)
+           (do
+             (if (in __l __lengths)
+                 (do ~@body))
+             (if __d
+                 (for __c (list __candidates)
+                   (.append ~perm __c)
+                   (.remove __candidates __c)
+                   (__recur (+ __l 1) (- __d 1))
+                   (.add __candidates __c)
+                   (.pop ~perm))))))
+     (__recur 0 __max-depth))))
+
+(def sol [n]
+  (= primes (build-primes (int (** 10 (+ 1 (// n 2))))))
+  (= ret 0)
+  (= i n)
+  (while (not ret)
+    (= ret-val 0)
+    (with-permutations perm (set (range 1 (+ 1 i))) [i]
+      (= p (lst-to-num perm))
+      (if (prime? p primes)
+          (do (nonlocal ret-val)
+              (= ret-val (max ret-val p)))))
+    (= ret ret-val)
+    (-= i 1))
+  (return ret))
+
+(print (sol 9))

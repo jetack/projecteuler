@@ -1,0 +1,6 @@
+(require lispy.macros *)
+
+(= n 1000)
+(print (- (+ (sum (range 3 n 3))
+      (sum (range 5 n 5)))
+   (sum (range 15 n 15))))

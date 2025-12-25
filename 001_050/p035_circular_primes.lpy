@@ -1,0 +1,33 @@
+(require lispy.macros *)
+
+;;; build-primes from 27
+(def build-primes [n]
+  (= sieve (* [True] n))
+  (for i (range 2)
+    (= (sub sieve i) False))
+  (for i (range 2 n)
+    (if (sub sieve i)
+        (for j (range (* 2 i) n i)
+          (= (sub sieve j) False))))
+  (return {, i for i in (range n) if (sub sieve i)}))
+
+(def all-circular [p]
+  (= ret {, p})
+  (= p-str (str p))
+  (if (in "0" p-str)
+      (return (set)))
+  (for i (range 1 (len p-str))
+    (ret.add (int (+ (sub p-str [: i None])
+                     (sub p-str [: None i])))))
+  (return ret))
+
+(def find-circular-primes [primes]
+  (= ret (set))
+  (for p (list primes)
+    (= circulars (all-circular p))
+    (if (and circulars (not [c for c in circulars if (not (in c primes))]))
+        (= ret (ret.union circulars)))
+    (-= primes circulars))
+  (return ret))
+
+(print (len (find-circular-primes (build-primes (** 10 6)))))

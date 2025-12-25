@@ -1,0 +1,36 @@
+(require lispy.macros *)
+
+(from time [time])
+
+(def get-period [n a]
+  (= mem (dict))
+  (= b 1)
+  (= step 0)
+  (while True
+    (if (in (, a b) mem)
+        (return (- step (sub mem (, a b))))
+        (= (sub mem (, a b)) step))
+    (= b (// (- n (** a 2)) b))
+    (= a (- a))
+    (while (<= (** a 2) n)
+      (+= a b))
+    (-= a b)
+    (+= step 1)))
+
+(def solution [N]
+  (= rst 0)
+  (= a 1)
+  (while True
+    (for i (range (+ (** a 2) 1) (** (+ a 1) 2))
+      (if (> i N) (return rst))
+      (if (% (get-period i a) 2)
+          (+= rst 1)))
+    (+= a 1))
+  (return rst))
+
+(def main []
+  (= start (time))
+  (print (solution 10000))
+  (print "elapsed:" (- (time) start)))
+
+(main)

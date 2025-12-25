@@ -1,0 +1,15 @@
+(require lispy.macros *)
+
+(def sol []
+  (= ret None)
+  (for i (range 999 99 -1)
+    (for j (range 999 99 -1)
+      (= n (* i j))
+      (= s (str n))
+      (if (and (== s (sub s [: None None -1]))
+               (or (is ret None)
+                   (> n ret)))
+          (= ret n))))
+  (return ret))
+
+(print (sol))

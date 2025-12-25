@@ -1,0 +1,39 @@
+(require lispy.macros *)
+
+(from time [time])
+(from collections [defaultdict])
+(from functools [reduce])
+
+(def solution []
+  (= dicts [(defaultdict list) for i in (range 6)])
+  (for i (range 6)
+    (= n 1)
+    (= p 1)
+    (while (< p 1000)
+      (+= p (+ 1 (* (+ i 1) n)))
+      (+= n 1))
+    (while (< p 10000)
+      (.append (sub (sub dicts i) (// p 100)) p)
+      (+= p (+ 1 (* (+ i 1) n)))
+      (+= n 1)))
+  (def search [mask hist]
+    (if (and (== mask 0) (== (// (sub hist 0) 100) (% (sub hist -1) 100)))
+        (return hist))
+    (for i (range 6)
+      (if (& mask (<< 1 i))
+          (if hist
+              (for p (sub (sub dicts i) (% (sub hist -1) 100))
+                (= rst (search (^ mask (<< 1 i)) (+ hist [p])))
+                (if rst (return rst)))
+              (for [k v] (.items (sub dicts i))
+                (for p v
+                  (= rst (search (^ mask (<< 1 i)) (+ hist [p])))
+                  (if rst (return rst))))))))
+  (return (sum (search (- (<< 1 6) 1) []))))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(main)

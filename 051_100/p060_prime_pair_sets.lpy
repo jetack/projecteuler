@@ -1,0 +1,58 @@
+(require lispy.macros *)
+
+(from time [time])
+(from collections [deque])
+
+(def prime? [n primes]
+  (for p primes
+    (cond (== (% n p) 0) (return False)
+          (> (* p p) n) (return True)))
+  (return True))
+
+(def sieve [n]
+  (= prime? (* [True] n))
+  (for i (range 4 n 2)
+    (= (sub prime? i) False))
+  (for i (range 3 n 2)
+    (if (> (* i i) n)
+        (break))
+    (for j (range (* 2 i) n i)
+      (= (sub prime? j) False)))
+  (return (+ [2] [i for i in (range 3 n 2) if (sub prime? i)])))
+
+(def int-concat [a b]
+  (return (+ (* a (** 10 (len (str b)))) b)))
+
+(def satisfies [lst compatibles]
+  (for i lst
+    (if (not (in i compatibles))
+        (return False)))
+  (return True))
+
+(def solution [:n 5]
+  (= primes (sieve 100000))
+  (= mem [[] for i in (range n)])
+  (= rst (float "inf"))
+  (for p primes
+    (if (> p rst) (break))
+    (= compatibles {, i for i in primes
+                   if (and (< i p)
+                           (prime? (int-concat i p) primes)
+                           (prime? (int-concat p i) primes))})
+    (for i compatibles
+      (.append (sub mem 2) [i p]))
+    (for lst (sub mem (- n 1))
+      (if (satisfies lst compatibles)
+          (= rst (min rst (+ (sum lst) p)))))
+    (for i (range (- n 2) 1 -1)
+      (for lst (sub mem i)
+        (if (satisfies lst compatibles)
+            (.append (sub mem (+ i 1)) (+ lst [p]))))))
+  (return rst))
+
+(def main []
+  (= start (time))
+  (print (solution 5))
+  (print "elapsed:" (- (time) start)))
+
+(main)

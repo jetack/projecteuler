@@ -1,0 +1,71 @@
+(require lispy.macros *)
+
+(def tco [f]
+  (= active False)
+  (= stored False)
+  (= argstore None)
+  (def wrapper [*args]
+    (nonlocal active stored argstore)
+    (= argstore args)
+    (= stored True)
+    (if (not active)
+        (do (= active True)
+            (while stored
+              (= stored False)
+              (= result (f *argstore)))
+            (= active False)
+            (return result))))
+  (return wrapper))
+
+(= ordered [0 1 2 3 4 5 6 7 8 9])
+
+(def fact [n]
+  (= ret 1)
+  (for i (range 2 (+ n 1))
+    (*= ret i))
+  (return ret))
+
+(def sol [n ordered]
+  (= l (len ordered))
+  (= mark (* [False] l))
+  
+  (def recur [depth step-size n ret mark]
+    (if (== depth 0)
+        (do (= i 0)
+            (while (sub mark i)
+              (+= i 1))
+            (return (+ ret (str (sub ordered i)))))
+        (do (= i 0)
+            (while (sub mark i)
+              (+= i 1))
+            (while (> n step-size)
+              (-= n step-size)
+              (+= i 1)
+              (while (sub mark i)
+                (+= i 1)))
+            (= d (sub ordered i))
+            (= (sub mark i) True)
+            (return (recur (- depth 1) (// step-size depth) n (+ ret (str d)) mark)))))
+  
+  (return (recur (- l 1) (fact (- l 1)) n "" mark)))
+
+;;; brute-force with recursion
+;; (def sol [n]
+;;   (deco [tco]
+;;     (def recur [hist n depth cnt]
+;;       (if (== depth 0)
+;;           (for d ordered
+;;             (if (in d hist) (continue))
+;;             (return [(str d) 1]))
+;;           (do (for d ordered
+;;                 (if (in d hist) (continue))
+;;                 (hist.add d)
+;;                 (= [s diff] (recur hist (- n cnt) (- depth 1) 0))
+;;                 (+= cnt diff)
+;;                 (if (== n cnt)
+;;                     (return [(+ (str d) s) n]))
+;;                 (hist.remove d))
+;;               (return [None cnt])))))
+;;   (return (sub (recur (set) n (- (len ordered) 1) 0) 0)))
+
+(print (sol (** 10 6) ordered))

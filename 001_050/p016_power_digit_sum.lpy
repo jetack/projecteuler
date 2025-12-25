@@ -1,0 +1,10 @@
+(require lispy.macros *)
+
+(def digit-sum [n]
+  (= ret 0)
+  (while n
+    (+= ret (% n 10))
+    (//= n 10))
+  (return ret))
+
+(print (digit-sum (<< 1 1000)))

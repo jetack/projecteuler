@@ -1,0 +1,29 @@
+(require lispy.macros *)
+
+(def prime? [n primes]
+  (for p primes
+    (cond (> (* p p) n) (return True)
+          (== (% n p) 0) (return False))))
+
+(def prime-generator []
+  (= primes [2])
+  (= last-prime 3)
+  (yield 2)
+  (while True
+    (while (not (prime? last-prime primes))
+      (+= last-prime 2))
+    (primes.append last-prime)
+    (yield last-prime)
+    (+= last-prime 2)))
+
+(def sol [n]
+  (= rst 1)
+  (= p-gen (prime-generator))
+  (while True
+    (= p (next p-gen))
+    (if (<= (* rst p) n)
+        (*= rst p)
+        (break)))
+  (return rst))
+
+(print (sol (** 10 6)))

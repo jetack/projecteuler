@@ -1,0 +1,39 @@
+(require lispy.macros *)
+
+(from time [time])
+
+(def next-p [primes]
+  (= c (sub primes -1))
+  (while True
+    (+= c 2)
+    (for p primes
+      (if (== (% c p) 0)
+          (break))
+      (if (> (* p p) c) (return c)))))
+
+(def solution [:N 5000]
+  (= mem [[1]
+          [0 0]])
+  (= primes [2 3])
+  (= n 2)
+  (while True
+    (while (< (sub primes -1) n)
+      (primes.append (next-p primes)))
+    (= partitions (* [0] (+ n 1)))
+    (= partial-sum 0)
+    (for p primes
+      (if (> p n) (break))
+      (+= partial-sum (sub (sub mem (- n p)) (min p (- n p))))
+      (= (sub partitions p) partial-sum))
+    (if (> partial-sum N) (break))
+    (= (sub partitions n) partial-sum)
+    (mem.append partitions)
+    (+= n 1))
+  (return n))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(main)

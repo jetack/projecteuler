@@ -1,0 +1,33 @@
+(require lispy.macros *)
+
+(def sum-of-proper-divisors [n]
+  (= mem (* [1] n))
+  (= (sub mem 0) -1)
+  (for i (range 2 n)
+    (for j (range (* 2 i) n i)
+      (+= (sub mem j) i)))
+  (return mem))
+
+(def calc-abundants [n]
+  (return [i for [i s] in (enumerate (sum-of-proper-divisors n)) if (> s i)]))
+
+(def abun-summable? [i abundants abun-set]
+  (for a abundants
+    (cond (> a (// i 2)) (break)
+          (in (- i a) abun-set) (return True)))
+  (return False))
+
+(def non-abun-sums [n]
+  (= abundants (calc-abundants n))
+  (= abun-set (set abundants))
+  (= ret [])
+  
+  (for i (range 1 n)
+    (if (not (abun-summable? i abundants abun-set))
+        (ret.append i)))
+  (return ret))
+
+(def sol [n]
+  (return (sum (non-abun-sums n))))
+
+(print (sol 28123))

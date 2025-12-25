@@ -1,0 +1,17 @@
+(require lispy.macros *)
+
+(def digit-sum [n]
+  (= rst 0)
+  (while n
+    (+= rst (% n 10))
+    (//= n 10))
+  (return rst))
+
+(def sol [n]
+  (= rst 0)
+  (for i (range 2 n)
+    (for j (range 2 n)
+      (= rst (max rst (digit-sum (** i j))))))
+  (return rst))
+
+(print (sol 100))

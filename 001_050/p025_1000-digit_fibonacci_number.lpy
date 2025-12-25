@@ -1,0 +1,48 @@
+(require lispy.macros *)
+
+(def tco [f]
+  (= active False)
+  (= stored False)
+  (= argstore None)
+  (def wrapper [*args]
+    (nonlocal active stored argstore)
+    (= argstore args)
+    (= stored True)
+    (if (not active)
+        (do (= active True)
+            (while stored
+              (= stored False)
+              (= result (f *argstore)))
+            (= active False)
+            (return result))))
+  (return wrapper))
+
+(def add-arr [a b]
+  (= remain 0)
+  (= ret [])
+  (for i (range (len a))
+    (= s (+ (sub a i)
+            (sub b i)
+            remain))
+    (ret.append (% s 10))
+    (= remain (// s 10)))
+  (for j (range (len a) (len b))
+    (= s (+ (sub b j)
+            remain))
+    (ret.append (% s 10))
+    (= remain (// s 10)))
+  (while remain
+    (ret.append (% remain 10))
+    (//= remain 10))
+  (return ret))
+
+(deco [tco]
+  (def recur [a b d n]
+    (if (>= (len a) d)
+        (return n)
+        (return (recur b (add-arr a b) d (+ n 1))))))
+
+(def sol [d]
+  (return (recur [1] [1] d 1)))
+
+(print (sol 1000))

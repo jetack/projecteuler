@@ -1,0 +1,28 @@
+(require lispy.macros *)
+
+(from time [time])
+
+(def gcd [a b]
+  (if (> a b)
+      (= [a b] [b a]))
+  (while a
+    (= [a b] [(% b a) a]))
+  (return b))
+
+(def solution [:D 1_000_000]
+  (= [a b] [0 1])
+  (= [rn rd] [3 7])
+  (for d (range 2 (+ D 1))
+    (for n (range (- (// (* rn d) rd) (== 0 (% (* rn d) rd))) (// (* a d) b) -1)
+      (if (> (gcd n d) 1)
+          (continue)
+          (do (= [a b] [n d])
+              (break)))))
+  (return [a b]))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(main)

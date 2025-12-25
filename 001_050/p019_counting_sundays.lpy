@@ -1,0 +1,32 @@
+(require lispy.macros *)
+
+(= days [0 31 28 31 30 31 30 31 31 30 31 30 31])
+
+(def leap-year? [y]
+  (cond (== (% y 400) 0) (return True)
+        (== (% y 100) 0) (return False)
+        (== (% y 4) 0) (return True))
+  (return False))
+
+(def num-days [y m]
+  (return (+ (sub days m)
+             (ife (and (== m 2) (leap-year? y)) 1 0))))
+
+(def sol [l r]
+  (= ret 0)
+  (= cur 0)
+  ;; calc first day
+  (for y (range 1900 l)
+    (for m (range 1 13)
+      (+= cur (num-days y m))))
+  (%= cur 7)
+
+  ;; count
+  (for y (range l r)
+    (for m (range 1 13)
+      (if (== cur 6) (+= ret 1))
+      (+= cur (num-days y m))
+      (%= cur 7)))
+  (return ret))
+
+(print (sol 1901 2001))

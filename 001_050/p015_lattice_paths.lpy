@@ -1,0 +1,10 @@
+(require lispy.macros *)
+
+(def comb [n k]
+  (def recur [n k ret i]
+    (if (> i k)
+        (return ret)
+        (return (recur (- n 1) k (// (* ret n) i) (+ i 1)))))
+  (return (recur n (min k (- n k)) 1 1)))
+
+(print (comb 40 20))

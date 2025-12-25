@@ -1,0 +1,20 @@
+(require lispy.macros *)
+
+(def eratosthenes [n]
+  (= mem (* [1] n))
+  (for i (range 2 n)
+    (for j (range (* 2 i) n i)
+      (+= (sub mem j) i)))
+  (return mem))
+
+(def sol [n]
+  (= ret 0)
+  (= mem (eratosthenes n))
+  (for i (range n)
+    (for j (range (+ i 1) n)
+      (if (and (== i (sub mem j))
+               (== j (sub mem i)))
+          (+= ret (+ i j)))))
+  (return ret))
+
+(print (sol 10000))

@@ -1,0 +1,29 @@
+(require lispy.macros *)
+
+(def parse [path]
+  (with [(open path "r") as f]
+    (return (list (map int (.split (.strip (f.readline)) ","))))))
+
+(def decrypt [encrypted key]
+  (= l (len key))
+  (return [(^ c (sub key (% i l))) for [i c] in (enumerate encrypted)]))
+
+(def seq-to-str [seq]
+  (return (.join "" [(chr c) for c in seq])))
+
+(def decrypted? [decrypted-str]
+  ;; started with ["the" "and"], when I added space after these words, only one decryption satisfies this condition
+  (= common-words ["the " "and "])
+  (return (all [(in w decrypted-str) for w in common-words])))
+
+(def sol [encrypted]
+  (= lower-cases (range (ord "a") (+ (ord "z") 1)))
+  (for i lower-cases
+    (for j lower-cases
+      (for k lower-cases
+        (= decrypted (decrypt encrypted [i j k]))
+        (if (decrypted? (seq-to-str decrypted))
+            (do (print (seq-to-str decrypted))
+                (return (sum decrypted))))))))
+
+(print (sol (parse "./p059_cipher.txt")))

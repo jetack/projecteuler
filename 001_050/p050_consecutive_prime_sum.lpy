@@ -1,0 +1,37 @@
+(require lispy.macros *)
+
+(def prime? [primes i]
+  (for p primes
+    (cond (== 0 (% i p)) (return False)
+          (> (* p p) i) (return True)))
+  (return True))
+
+(def build-primes [n]
+  (= primes [2])
+  (for i (range 3 n 2)
+    (if (prime? primes i)
+        (primes.append i)))
+  (return primes))
+
+(def get-pfsum [lst]
+  (= rst (+ [0] lst))
+  (for i (range (len lst))
+    (+= (sub rst (+ i 1)) (sub rst i)))
+  (return rst))
+
+(def sol [n]
+  (= primes (build-primes n))
+  (= pfsum (get-pfsum primes))
+  (= prime-set {, p for p in primes})
+  (= rst 0)
+  (= max-len 0)
+  (for i (range (len primes))
+    (for j (range (+ i 1) (len pfsum))
+      (= consec (- (sub pfsum j) (sub pfsum i)))
+      (cond (> consec n) (break)
+            (and (in consec prime-set)
+                  (> (- j i) max-len))
+             (do (= [rst max-len] [consec (- j i)])))))
+  (return rst))
+
+(print (sol 1000000))

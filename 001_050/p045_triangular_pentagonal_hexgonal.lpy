@@ -1,0 +1,43 @@
+(require lispy.macros *)
+
+(def triangle []
+  (= n 1)
+  (= rst 0)
+  (while True
+    (+= rst n)
+    (+= n 1)
+    (yield rst)))
+
+(def pentagonal []
+  (= n 1)
+  (= rst 0)
+  (while True
+    (+= rst n)
+    (+= n 3)
+    (yield rst)))
+
+(def hexagonal []
+  (= n 1)
+  (= rst 0)
+  (while True
+    (+= rst n)
+    (+= n 4)
+    (yield rst)))
+
+(def sol [n]
+  (= last-pen 0)
+  (= last-tri 0)
+  (= gen-pen (pentagonal))
+  (= gen-tri (triangle))
+  (for h (hexagonal)
+    (while (< last-pen h)
+      (= last-pen (next gen-pen)))
+    (while (< last-tri h)
+      (= last-tri (next gen-tri)))
+    (if (and (== h last-pen) (== last-pen last-tri))
+        (do (print h)
+            (-= n 1)
+            (if (== n 0)
+                (return h))))))
+
+(print (sol 3))

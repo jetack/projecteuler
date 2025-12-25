@@ -1,0 +1,29 @@
+(require lispy.macros *)
+
+(from time [time])
+(from collections [defaultdict])
+
+(def n2i [n]
+  (return (.join "" (sorted (str n)))))
+
+(def solution [:n 5]
+  (= i2lst (defaultdict list))
+  (= i 0)
+  (= l 1)
+  (while True
+    (+= i 1)
+    (= cubic (** i 3))
+    (= idx (n2i cubic))
+    (if (> (len idx) l)
+        (do (= found [(sub v 0) for [j v] in (i2lst.items) if (== (len v) n)])
+            (= i2lst (defaultdict list))
+            (= l (len idx))
+            (if found (return (min found)))))
+    (.append (sub i2lst (n2i cubic)) cubic)))
+
+(def main []
+  (= start (time))
+  (print (solution))
+  (print "elapsed:" (- (time) start)))
+
+(main)

@@ -1,0 +1,21 @@
+(require lispy.macros *)
+
+(from functools [cache])
+
+(def parse [path]
+  (with [(open path "r") as f]
+    (return [(list (map int (.split (.strip x) ","))) for x in (f.readlines)])))
+
+(def sol [path]
+  (= mat (parse path))
+  (deco [cache]
+    (def min-path [i j]
+      (= prevs [])
+      (if (> i 0)
+          (prevs.append (min-path (- i 1) j)))
+      (if (> j 0)
+          (prevs.append (min-path i (- j 1))))
+      (return (+ (sub (sub mat i) j) (ife prevs (min prevs) 0)))))
+  (return (min-path 79 79)))
+
+(print (sol "./p081_matrix.txt"))
