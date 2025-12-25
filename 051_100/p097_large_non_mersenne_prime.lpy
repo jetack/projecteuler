@@ -1,6 +1,6 @@
 (require lispy.macros *)
 
-(= x 38433)
+(= x 28433)
 
 (for i (range 7830457)
   (*= x 2)
