@@ -1,15 +1,17 @@
-(defn condition? [n]
-  (setv digit-set (set (str n)))
+(require lispy.macros *)
+
+(def condition? [n]
+  (= digit-set (set (str n)))
   (if (!= (len digit-set)
           (len (str n)))
       (return False))
-  (for [i (range 2 7)]
+  (for i (range 2 7)
     (if (!= (set (str (* i n)))
             digit-set)
         (return False)))
-  True)
+  (return True))
 
-(setv i 1)
+(= i 1)
 (while (not (condition? i))
   (+= i 1))
 (print i)

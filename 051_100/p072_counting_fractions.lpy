@@ -1,24 +1,22 @@
-;;; hy==1.0a4
+(require lispy.macros *)
 
-(import time [time])
+(from time [time])
 
-(defn solution [[D 1_000_000]]
-  (setv sieve (* [True] (+ D 1))
-        phi (list (range (+ D 1))))
-  (for [d (range 2 (+ D 1))]
-    (when (get sieve d)
-      (-= (get phi d) 1)
-      (for [i (range (* 2 d) (+ D 1) d)]
-        (setv (get sieve i) False)
-        (//= (get phi i) d)
-        (*= (get phi i) (- d 1)))))
-  (sum (cut phi 2 None)))
+(def solution [:D 1_000_000]
+  (= sieve (* [True] (+ D 1)))
+  (= phi (list (range (+ D 1))))
+  (for d (range 2 (+ D 1))
+    (if (sub sieve d)
+        (do (-= (sub phi d) 1)
+            (for i (range (* 2 d) (+ D 1) d)
+              (= (sub sieve i) False)
+              (//= (sub phi i) d)
+              (*= (sub phi i) (- d 1))))))
+  (return (sum (sub phi [: 2 None]))))
 
-(defn main []
-  (setv start (time))
+(def main []
+  (= start (time))
   (print (solution))
   (print "elapsed:" (- (time) start)))
 
 (main)
-
-

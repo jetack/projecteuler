@@ -1,21 +1,21 @@
-;;; hy==1.0a4
+(require lispy.macros *)
 
-(import time [time])
+(from time [time])
 
-(defn solution [[n 100]]
-  (setv mem [[1]
-             [0 1]])
-  (for [i (range 2 (+ n 1))]
-    (setv partitions [0]
-          partial-sum 0)
-    (for [j (range 1 (+ i 1))]
-      (+= partial-sum (get (get mem (- i j)) (min j (- i j))))
+(def solution [:n 100]
+  (= mem [[1]
+          [0 1]])
+  (for i (range 2 (+ n 1))
+    (= partitions [0])
+    (= partial-sum 0)
+    (for j (range 1 (+ i 1))
+      (+= partial-sum (sub (sub mem (- i j)) (min j (- i j))))
       (partitions.append partial-sum))
     (mem.append partitions))
-  (get (get mem -1) -2))
+  (return (sub (sub mem -1) -2)))
 
-(defn main []
-  (setv start (time))
+(def main []
+  (= start (time))
   (print (solution 100))
   (print "elapsed:" (- (time) start)))
 

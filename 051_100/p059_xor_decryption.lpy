@@ -1,33 +1,29 @@
-;;; hy==1.0a4
+(require lispy.macros *)
 
-(defn parse [path]
-  (with [f (open path "r")]
-    (as-> (f.readline) x
-          (x.strip)
-          (x.split ",")
-          (map int x)
-          (list x))))
+(def parse [path]
+  (with [(open path "r") as f]
+    (return (list (map int (.split (.strip (f.readline)) ","))))))
 
-(defn decrypt [encrypted key]
-  (setv l (len key))
-  (lfor [i c] (enumerate encrypted) (^ c (get key (% i l)))))
+(def decrypt [encrypted key]
+  (= l (len key))
+  (return [(^ c (sub key (% i l))) for [i c] in (enumerate encrypted)]))
 
-(defn seq-to-str [seq]
-  (.join "" (lfor c seq (chr c))))
+(def seq-to-str [seq]
+  (return (.join "" [(chr c) for c in seq])))
 
-(defn decrypted? [decrypted-str]
+(def decrypted? [decrypted-str]
   ;; started with ["the" "and"], when I added space after these words, only one decryption satisfies this condition
-  (setv common-words ["the " "and "])
-  (and #* (lfor w common-words (in w decrypted-str))))
+  (= common-words ["the " "and "])
+  (return (all [(in w decrypted-str) for w in common-words])))
 
-(defn sol [encrypted]
-  (setv lower-cases (range (ord "a") (+ (ord "z") 1)))
-  (for [i lower-cases]
-    (for [j lower-cases]
-      (for [k lower-cases]
-        (setv decrypted (decrypt encrypted [i j k]))
-        (when (decrypted? (seq-to-str decrypted))
-          (print (seq-to-str decrypted))
-          (return (sum decrypted)))))))
+(def sol [encrypted]
+  (= lower-cases (range (ord "a") (+ (ord "z") 1)))
+  (for i lower-cases
+    (for j lower-cases
+      (for k lower-cases
+        (= decrypted (decrypt encrypted [i j k]))
+        (if (decrypted? (seq-to-str decrypted))
+            (do (print (seq-to-str decrypted))
+                (return (sum decrypted))))))))
 
 (print (sol (parse "./p059_cipher.txt")))

@@ -1,88 +1,83 @@
-;;; hy==1.0a4
+(require lispy.macros *)
 
-(import time [time]
-        collections [Counter defaultdict])
+(from time [time])
+(from collections [Counter defaultdict])
 
-(defn char-to-num [c]
-  (setv d {"T" 10 "J" 11 "Q" 12 "K" 13 "A" 14})
-  (if (in c d)
-      (get d c)
-      (int c)))
+(def char-to-num [c]
+  (= d {"T" 10 "J" 11 "Q" 12 "K" 13 "A" 14})
+  (return (ife (in c d)
+               (sub d c)
+               (int c))))
 
-(defn parse-hand [hand]
-  (setv suits (set)
-        nums [])
-  (for [card hand]
-    (suits.add (get card 1))
-    (nums.append (char-to-num (get card 0))))
-  (setv c2num (defaultdict list))
-  (for [[n c] (.items (Counter nums))]
-    (.append (get c2num c) n))
-  (for [v (c2num.values)]
+(def parse-hand [hand]
+  (= suits (set))
+  (= nums [])
+  (for card hand
+    (suits.add (sub card 1))
+    (nums.append (char-to-num (sub card 0))))
+  (= c2num (defaultdict list))
+  (for [n c] (.items (Counter nums))
+    (.append (sub c2num c) n))
+  (for v (c2num.values)
     (v.sort))
-  [(= 1 (len suits)) (sorted nums :reverse True) c2num])
+  (return [(== 1 (len suits)) (sorted nums :reverse True) c2num]))
 
-(defn straight? [nums]
-  (for [i (range 4)]
-    (if (!= (get nums i) (+ (get nums (+ i 1)) 1))
+(def straight? [nums]
+  (for i (range 4)
+    (if (!= (sub nums i) (+ (sub nums (+ i 1)) 1))
         (return False)))
-  True)
+  (return True))
 
-(defn four-card? [cnt]
-  (if (in 4 cnt)
-      [True (get cnt 4)]
-      [False None]))
+(def four-card? [cnt]
+  (return (ife (in 4 cnt)
+               [True (sub cnt 4)]
+               [False None])))
 
-(defn house? [cnt]
-  (if (and (in 3 cnt) (in 2 cnt))
-      [True [(get cnt 3) (get cnt 2)]]
-      [False None]))
+(def house? [cnt]
+  (return (ife (and (in 3 cnt) (in 2 cnt))
+               [True [(sub cnt 3) (sub cnt 2)]]
+               [False None])))
 
-(defn three-card? [cnt]
-  (if (in 3 cnt)
-      [True (get cnt 3)]
-      [False None]))
+(def three-card? [cnt]
+  (return (ife (in 3 cnt)
+               [True (sub cnt 3)]
+               [False None])))
 
-(defn calc-hand [hand]
-  (setv [f? nums cnt] (parse-hand hand)
-        s? (straight? nums))
+(def calc-hand [hand]
+  (= [f? nums cnt] (parse-hand hand))
+  (= s? (straight? nums))
   (if (and s? f?)
       (return [8 nums]))
-  (setv [made? rep] (four-card? cnt))
+  (= [made? rep] (four-card? cnt))
   (if made?
       (return [7 nums]))
-  (setv [made? rep] (house? cnt))
+  (= [made? rep] (house? cnt))
   (if made?
       (return [6 rep nums]))
   (if f?
       (return [5 nums]))
   (if s?
       (return [4 nums]))
-  (setv [made? rep] (three-card? cnt))
+  (= [made? rep] (three-card? cnt))
   (if made?
       (return [3 rep nums]))
-  (setv pairs (get cnt 2))
-  [(len pairs) pairs nums])
+  (= pairs (sub cnt 2))
+  (return [(len pairs) pairs nums]))
 
-(defn leftwin? [cards]
-  (setv left-hand (cut cards None 5)
-        right-hand (cut cards 5 None)
-        left-stat (calc-hand left-hand)
-        right-stat (calc-hand right-hand))
-  (> left-stat right-stat))
+(def leftwin? [cards]
+  (= left-hand (sub cards [: None 5]))
+  (= right-hand (sub cards [: 5 None]))
+  (= left-stat (calc-hand left-hand))
+  (= right-stat (calc-hand right-hand))
+  (return (> left-stat right-stat)))
 
-(defn solution []
-  (with [f (open "./p054_poker.txt")]
-    (setv lines (f.readlines)))
-  ;; (setv lines ["5H 5C 6S 7S KD 2C 3S 8S 8D TD"
-  ;;              "5D 8C 9S JS AC 2C 5C 7D 8S QH"
-  ;;              "2D 9C AS AH AC 3D 6D 7D TD QD"
-  ;;              "4D 6S 9H QH QC 3D 6D 7H QD QS"
-  ;;              "2H 2D 4C 4D 4S 3C 3D 3S 9S 9D"])
-  (sum (lfor line lines (leftwin? (.split (.strip line) " ")))))
+(def solution []
+  (with [(open "./p054_poker.txt") as f]
+    (= lines (f.readlines)))
+  (return (sum [(leftwin? (.split (.strip line) " ")) for line in lines])))
 
-(defn main []
-  (setv start (time))
+(def main []
+  (= start (time))
   (print (solution))
   (print "elapsed:" (- (time) start)))
 

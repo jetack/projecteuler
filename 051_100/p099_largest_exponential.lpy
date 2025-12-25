@@ -1,21 +1,15 @@
-;;; hy==1.0a4
-(import hyrule *)
-(require hyrule *)
+(require lispy.macros *)
 
-(import math [log])
+(from math [log])
 
-(defn parse [path]
-  (with [f (open path "r")]
-    (lfor line (f.readlines) (as-> line x
-                                   (x.strip)
-                                   (x.split ",")
-                                   (map int x)
-                                   (list x)))))
+(def parse [path]
+  (with [(open path "r") as f]
+    (return [(list (map int (.split (.strip x) ","))) for x in (f.readlines)])))
 
-(defn project [base exponent]
-  (+ (log exponent) (log (log base))))
+(def project [base exponent]
+  (return (+ (log exponent) (log (log base)))))
 
-(defn sol [parsed]
-  (max (range (len parsed)) :key (fn [i] (setv x (get parsed i)) (project #* x))))
+(def sol [parsed]
+  (return (max (range (len parsed)) :key (lambda [i] (project *(sub parsed i))))))
 
 (print (+ 1 (sol (parse "./p099_base_exp.txt"))))

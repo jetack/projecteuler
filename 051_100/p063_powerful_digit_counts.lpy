@@ -1,19 +1,21 @@
-(defn count-for-digit [d]
-  (setv lower 1
-        upper 10
-        n d
-        cnt 0)
+(require lispy.macros *)
+
+(def count-for-digit [d]
+  (= lower 1)
+  (= upper 10)
+  (= n d)
+  (= cnt 0)
   (while (and (<= lower n) (< n upper))
     (+= cnt 1)
     (*= lower 10)
     (*= upper 10)
     (*= n d))
-  cnt)
+  (return cnt))
 
-(defn sol []
-  (setv rst 0)
-  (for [i (range 1 10)]
+(def sol []
+  (= rst 0)
+  (for i (range 1 10)
     (+= rst (count-for-digit i)))
-  rst)
+  (return rst))
 
-(sol)
+(print (sol))

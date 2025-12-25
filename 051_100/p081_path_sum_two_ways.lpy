@@ -1,30 +1,21 @@
-;;; hy==1.0a4
+(require lispy.macros *)
 
-(import hyrule *)
-(require hyrule *)
+(from functools [cache])
 
-(import functools [cache])
+(def parse [path]
+  (with [(open path "r") as f]
+    (return [(list (map int (.split (.strip x) ","))) for x in (f.readlines)])))
 
+(def sol [path]
+  (= mat (parse path))
+  (deco [cache]
+    (def min-path [i j]
+      (= prevs [])
+      (if (> i 0)
+          (prevs.append (min-path (- i 1) j)))
+      (if (> j 0)
+          (prevs.append (min-path i (- j 1))))
+      (return (+ (sub (sub mat i) j) (ife prevs (min prevs) 0)))))
+  (return (min-path 79 79)))
 
-
-(defn parse [path]
-  (with [f (open path "r")]
-    (lfor line (f.readlines) (as-> line x
-                                   (x.strip)
-                                   (x.split ",")
-                                   (map int x)
-                                   (list x)))))
-
-(defn sol [path]
-  (setv mat (parse path))
-  #@(cache
-      (defn min-path [i j]
-        (setv prevs [])
-        (if (> i 0)
-            (prevs.append (min-path (- i 1) j)))
-        (if (> j 0)
-            (prevs.append (min-path i (- j 1))))
-        (+ (get (get mat i) j) (if prevs (min prevs) 0))))
-  (min-path 79 79))
-
-(sol "./p081_matrix.txt")
+(print (sol "./p081_matrix.txt"))

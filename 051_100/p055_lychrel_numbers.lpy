@@ -1,22 +1,22 @@
-(defmacro do-sth [#* body]
-  (setv [condition body] [(get body -1) (get body (slice None -2))])
-  `(do
+(require lispy.macros *)
+
+(defmacro do-while [condition *body]
+  (return `(while True
      ~@body
-     (while ~condition
-       ~@body)))
+     (if (not ~condition)
+         (break)))))
 
-(defn palindrome? [n]
-  (= (str n) (get (str n) (slice None None -1))))
+(def palindrome? [n]
+  (return (== (str n) (sub (str n) [: None None -1]))))
 
-(defn lychrel? [n]
-  (setv limit 50)
-  (do-sth
-    (setv n (+ n (int (get (str n) (slice None None -1)))))
-    (-= limit 1)
-    :while (and limit (not (palindrome? n))))
-  (= limit 0))
+(def lychrel? [n]
+  (= limit 50)
+  (do-while (and limit (not (palindrome? n)))
+    (= n (+ n (int (sub (str n) [: None None -1]))))
+    (-= limit 1))
+  (return (== limit 0)))
 
-(defn sol [n]
-  (len (list (filter lychrel? (range 10000)))))
+(def sol [n]
+  (return (len (list (filter lychrel? (range 10000))))))
 
-(sol 10000)
+(print (sol 10000))

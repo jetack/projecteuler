@@ -1,49 +1,51 @@
-;;; hy==1.0a4
+(require lispy.macros *)
+
 ;;; Cpython 27s, pypy 800ms
 
-(defn tco [f]
-  (setv active False
-        stored False
-        argstore None)
-  (fn [#* args]
+(def tco [f]
+  (= active False)
+  (= stored False)
+  (= argstore None)
+  (def wrapper [*args]
     (nonlocal active stored argstore)
-    (setv argstore args)
-    (setv stored True)
-    (when (not active)
-      (setv active True)
-      (while stored
-        (setv stored False)
-        (setv result (f #* argstore)))
-      (setv active False)
-      result)))
+    (= argstore args)
+    (= stored True)
+    (if (not active)
+        (do (= active True)
+            (while stored
+              (= stored False)
+              (= result (f *argstore)))
+            (= active False)
+            (return result))))
+  (return wrapper))
 
-(import functools [lru_cache]
-        time [time])
+(from functools [lru_cache])
+(from time [time])
 
-(defn square-digit-sum [n]
-  (setv rst 0)
+(def square-digit-sum [n]
+  (= rst 0)
   (while n
     (+= rst (** (% n 10) 2))
     (//= n 10))
-  rst)
+  (return rst))
 
-(with-decorator tco
-  (defn which-chain? [ds]
-    (if (or (= ds 1) (= ds 89))
-        ds
-        (which-chain? (square-digit-sum ds)))))
+(deco [tco]
+  (def which-chain? [ds]
+    (return (ife (or (== ds 1) (== ds 89))
+                 ds
+                 (which-chain? (square-digit-sum ds))))))
 
-(with-decorator (lru_cache :maxsize None)
-  (defn cached-which-chain? [ds]
-    (which-chain? ds)))
+(deco [(lru_cache :maxsize None)]
+  (def cached-which-chain? [ds]
+    (return (which-chain? ds))))
 
-(defn sol [n]
-  (setv rst 0)
-  (for [i (range 1 n)]
-    (if (= 89 (cached-which-chain? (square-digit-sum i)))
+(def sol [n]
+  (= rst 0)
+  (for i (range 1 n)
+    (if (== 89 (cached-which-chain? (square-digit-sum i)))
         (+= rst 1)))
-  rst)
+  (return rst))
 
-(setv t (time))
+(= t (time))
 (print (sol (** 10 7)))
 (print (- (time) t))
